@@ -1,0 +1,109 @@
+<wxs src="../../utils/format.wxs" module="fmt" />
+<wxs src="../../utils/format.wxs" module="calc" />
+
+<view class="assets-page">
+  <!-- Search bar -->
+  <view class="search-bar glass">
+    <image src="/images/placeholder.png" mode="aspectFit" class="search-icon"></image>
+    <input
+      class="search-input"
+      placeholder="搜索资产名称..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+      confirm-type="search"
+    />
+    <view class="search-toggle" bindtap="toggleValues">
+      <text class="toggle-text">{{showValues ? '隐藏' : '显示'}}金额</text>
+    </view>
+  </view>
+
+  <!-- Category filter pills -->
+  <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="category-pills">
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="pill {{activeCategory === item.id ? 'pill-active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="filterByCategory"
+      >
+        <view class="pill-dot" style="background: {{item.color}};" wx:if="{{item.id}}"></view>
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <!-- Empty state -->
+  <view wx:elif="{{!hasData && !loading}}" class="empty-state">
+    <view class="empty-icon">
+      <image src="/images/placeholder.png" mode="aspectFit" style="width: 56rpx; height: 56rpx; opacity: 0.3;"></image>
+    </view>
+    <text class="empty-title">还没有添加资产</text>
+    <text class="empty-desc">点击右下角按钮开始记录资产</text>
+  </view>
+
+  <!-- No search results -->
+  <view wx:elif="{{filteredAssets.length === 0 && hasData}}">
+    <view class="empty-state" style="padding: 60rpx;">
+      <text class="empty-desc">没有找到匹配的资产</text>
+    </view>
+  </view>
+
+  <!-- Asset cards -->
+  <view wx:elif="{{filteredAssets.length > 0}}" class="asset-list">
+    <view
+      wx:for="{{filteredAssets}}"
+      wx:key="_id"
+      class="asset-card glass animate-in"
+      data-id="{{item._id}}"
+      bindtap="goToAssetDetail"
+    >
+      <!-- Top row: name + return badge -->
+      <view class="asset-card-top">
+        <view class="asset-card-name-row">
+          <view class="asset-card-avatar">{{fmt.getFirstChar(item.name)}}</view>
+          <text class="asset-card-name">{{item.name}}</text>
+        </view>
+        <view class="tag {{calc.isAssetReturnPositive(item) ? 'tag-red' : 'tag-emerald'}}">
+          <text wx:if="{{calc.isAssetReturnPositive(item)}}">↑</text>
+          <text wx:else>↓</text>
+          <text>{{calc.getAssetReturn(item)}}</text>
+        </view>
+      </view>
+
+      <!-- Middle: category + date -->
+      <view class="asset-card-mid">
+        <view class="tag tag-muted">
+          <view class="pill-dot" style="background: {{item.categoryColor}}; width: 12rpx; height: 12rpx; margin-right: 8rpx;" wx:if="{{item.categoryColor}}"></view>
+          <text>{{item.categoryName || '未分类'}}</text>
+        </view>
+        <text class="asset-card-date">{{item.purchaseDate}}</text>
+      </view>
+
+      <!-- Bottom: cost vs value -->
+      <view class="asset-card-bottom">
+        <view class="asset-card-field">
+          <text class="asset-card-label">成本</text>
+          <text class="asset-card-amount" wx:if="{{showValues}}">{{fmt.formatCurrency(item.purchaseAmount)}}</text>
+          <text class="asset-card-hidden" wx:else>****</text>
+        </view>
+        <view class="asset-card-divider"></view>
+        <view class="asset-card-field" style="align-items: flex-end;">
+          <text class="asset-card-label">当前价值</text>
+          <text class="asset-card-amount asset-card-amount-primary" wx:if="{{showValues}}">{{fmt.formatCurrency(item.currentValue)}}</text>
+          <text class="asset-card-hidden" wx:else>****</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- FAB button -->
+  <view class="fab" bindtap="goToAssetAdd">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

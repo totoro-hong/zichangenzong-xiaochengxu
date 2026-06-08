@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/dashboard/dashboard",
+    "pages/assets/assets",
+    "pages/asset-add/asset-add",
+    "pages/asset-edit/asset-edit",
+    "pages/asset-detail/asset-detail",
+    "pages/groups/groups",
+    "pages/group-detail/group-detail",
+    "pages/group-create/group-create"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "资产跟踪",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f4f8f6"
+  },
+  "tabBar": {
+    "color": "#7a8f84",
+    "selectedColor": "#3b9e6e",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/dashboard/dashboard",
+        "text": "总览",
+        "iconPath": "images/icon-asset.png",
+        "selectedIconPath": "images/icon-asset-active.png"
+      },
+      {
+        "pagePath": "pages/assets/assets",
+        "text": "资产",
+        "iconPath": "images/icon-asset.png",
+        "selectedIconPath": "images/icon-asset-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

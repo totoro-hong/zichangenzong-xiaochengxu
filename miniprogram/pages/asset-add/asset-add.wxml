@@ -1,0 +1,116 @@
+<view class="form-page">
+  <scroll-view class="form-scroll" scroll-y>
+    <!-- Error message -->
+    <view wx:if="{{error}}" class="error-banner">
+      <text>{{error}}</text>
+    </view>
+
+    <view class="card form-card">
+      <!-- Name -->
+      <view class="form-group">
+        <text class="form-label">资产名称 *</text>
+        <input
+          class="form-input"
+          placeholder="如：余额宝、易方达蓝筹..."
+          value="{{name}}"
+          bindinput="onInput"
+          data-field="name"
+        />
+      </view>
+
+      <!-- Category -->
+      <view class="form-group">
+        <text class="form-label">分类 *</text>
+        <picker
+          class="form-picker"
+          mode="selector"
+          range="{{categories}}"
+          range-key="name"
+          value="{{categoryIndex}}"
+          bindchange="onCategoryChange"
+        >
+          <view wx:if="{{categoryIndex >= 0}}" class="flex-row items-center gap-1">
+            <view class="cat-dot" style="background: {{categoryColor}};"></view>
+            <text>{{categoryName}}</text>
+          </view>
+          <view wx:else class="picker-placeholder">选择分类</view>
+        </picker>
+      </view>
+
+      <!-- Group -->
+      <view class="form-group">
+        <text class="form-label">所属群组 *</text>
+        <picker
+          class="form-picker"
+          mode="selector"
+          range="{{groupNames}}"
+          value="{{groupIndex}}"
+          bindchange="onGroupChange"
+        >
+          <view wx:if="{{groupIndex >= 0}}">{{groupName}}</view>
+          <view wx:else class="picker-placeholder">选择群组</view>
+        </picker>
+      </view>
+
+      <!-- Purchase amount -->
+      <view class="form-group">
+        <text class="form-label">买入金额 (¥) *</text>
+        <input
+          class="form-input"
+          type="digit"
+          placeholder="0.00"
+          value="{{purchaseAmount}}"
+          bindinput="onInput"
+          data-field="purchaseAmount"
+        />
+      </view>
+
+      <!-- Current value -->
+      <view class="form-group">
+        <text class="form-label">当前价值 (¥) *</text>
+        <input
+          class="form-input"
+          type="digit"
+          placeholder="0.00"
+          value="{{currentValue}}"
+          bindinput="onInput"
+          data-field="currentValue"
+        />
+      </view>
+
+      <!-- Purchase date -->
+      <view class="form-group">
+        <text class="form-label">购入日期 *</text>
+        <picker
+          class="form-picker"
+          mode="date"
+          value="{{purchaseDate}}"
+          bindchange="onDateChange"
+        >
+          <view>{{purchaseDate}}</view>
+        </picker>
+      </view>
+
+      <!-- Note -->
+      <view class="form-group">
+        <text class="form-label">备注</text>
+        <textarea
+          class="form-textarea"
+          placeholder="可选备注信息"
+          value="{{note}}"
+          bindinput="onInput"
+          data-field="note"
+        />
+      </view>
+    </view>
+
+    <!-- Actions -->
+    <view class="form-actions">
+      <button class="btn btn-primary submit-btn" bindtap="submit" disabled="{{submitting}}">
+        <view wx:if="{{submitting}}" class="loading-spinner" style="width: 32rpx; height: 32rpx; border-width: 3rpx; margin-right: 12rpx;"></view>
+        <text wx:else>添加资产</text>
+      </button>
+      <button class="btn btn-outline" bindtap="wx.navigateBack">取消</button>
+    </view>
+  </scroll-view>
+</view>

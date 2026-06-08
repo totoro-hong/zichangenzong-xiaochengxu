@@ -1,0 +1,48 @@
+<view class="groups-page">
+  <!-- Header -->
+  <view class="groups-header">
+    <text class="page-title">我的群组</text>
+    <view class="btn btn-primary btn-small" bindtap="goToGroupCreate">创建群组</view>
+  </view>
+
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <!-- Empty state -->
+  <view wx:elif="{{groups.length === 0}}" class="empty-state">
+    <view class="empty-icon">
+      <image src="/images/placeholder.png" mode="aspectFit" style="width: 56rpx; height: 56rpx; opacity: 0.3;"></image>
+    </view>
+    <text class="empty-title">还没有群组</text>
+    <text class="empty-desc">创建一个群组与家人朋友共享资产</text>
+  </view>
+
+  <!-- Group list -->
+  <view wx:elif="{{groups.length > 0}}" class="groups-list">
+    <view
+      wx:for="{{groups}}"
+      wx:key="_id"
+      class="group-card glass"
+      data-id="{{item._id}}"
+      bindtap="goToGroupDetail"
+    >
+      <view class="group-card-accent"></view>
+      <view class="group-card-body">
+        <view class="group-card-top">
+          <view class="group-avatar">
+            <text class="group-avatar-text">{{item.name.charAt(0)}}</text>
+          </view>
+          <view class="group-info">
+            <text class="group-name">{{item.name}}</text>
+            <text class="group-meta">{{item.memberCount || 1}} 位成员</text>
+          </view>
+        </view>
+        <view class="group-role">
+          <text class="tag tag-primary">{{item.myRole === 'owner' ? '所有者' : item.myRole === 'admin' ? '管理员' : '成员'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,83 @@
+<wxs src="../../utils/format.wxs" module="fmt" />
+
+<view class="detail-page">
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <!-- Not found -->
+  <view wx:elif="{{!asset}}" class="empty-state">
+    <text class="empty-title">资产不存在</text>
+  </view>
+
+  <!-- Detail content -->
+  <scroll-view wx:elif="{{asset._id}}" class="detail-scroll" scroll-y>
+    <!-- Hero section -->
+    <view class="hero-section glass">
+      <view class="hero-icon">
+        <text class="hero-icon-text">{{fmt.getFirstChar(asset.name)}}</text>
+      </view>
+      <text class="hero-name">{{asset.name}}</text>
+      <view class="hero-category-row">
+        <view class="hero-cat-dot" style="background: {{asset.categoryColor || '#999'}};"></view>
+        <text class="hero-category">{{asset.categoryName || '未分类'}}</text>
+      </view>
+    </view>
+
+    <!-- Value comparison card -->
+    <view class="value-card glass">
+      <view class="value-row">
+        <view class="value-field">
+          <text class="value-label">买入金额</text>
+          <text class="value-amount">{{formattedPurchaseAmount}}</text>
+        </view>
+        <view class="value-arrow">
+          <text class="arrow-icon">{{returnPositive ? '↑' : '↓'}}</text>
+        </view>
+        <view class="value-field" style="align-items: flex-end;">
+          <text class="value-label">当前价值</text>
+          <text class="value-amount value-amount-primary">{{formattedCurrentValue}}</text>
+        </view>
+      </view>
+      <view class="return-row {{returnPositive ? 'return-positive' : 'return-negative'}}">
+        <text class="return-label">收益率</text>
+        <text class="return-value">{{returnRate}}</text>
+      </view>
+    </view>
+
+    <!-- Details card -->
+    <view class="details-card glass">
+      <view class="detail-row">
+        <text class="detail-label">购入日期</text>
+        <text class="detail-value">{{asset.purchaseDate}}</text>
+      </view>
+      <view class="detail-row">
+        <text class="detail-label">分类</text>
+        <view class="flex-row items-center gap-1">
+          <view class="cat-dot" style="background: {{asset.categoryColor || '#999'}};"></view>
+          <text class="detail-value">{{asset.categoryName || '未分类'}}</text>
+        </view>
+      </view>
+      <view class="detail-row" wx:if="{{asset.note}}">
+        <text class="detail-label">备注</text>
+        <text class="detail-value detail-note">{{asset.note}}</text>
+      </view>
+    </view>
+
+    <!-- Time info -->
+    <view class="time-info">
+      <text class="time-text">创建时间：{{formattedCreatedAt}}</text>
+      <text class="time-text">更新时间：{{formattedUpdatedAt}}</text>
+    </view>
+
+    <!-- Actions -->
+    <view class="detail-actions">
+      <button class="btn btn-primary" bindtap="goEdit">编辑资产</button>
+      <button class="btn btn-danger" bindtap="deleteAsset" disabled="{{deleting}}">
+        <view wx:if="{{deleting}}" class="loading-spinner" style="width: 28rpx; height: 28rpx; border-width: 3rpx; border-top-color: var(--destructive);"></view>
+        <text wx:else>删除资产</text>
+      </button>
+    </view>
+  </scroll-view>
+</view>

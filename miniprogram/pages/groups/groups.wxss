@@ -1,0 +1,86 @@
+.groups-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 24rpx 28rpx 60rpx;
+}
+
+.groups-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}
+
+/* ── Group cards ── */
+.groups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.group-card {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.group-card:active {
+  opacity: 0.85;
+}
+
+.group-card-accent {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(59, 158, 110, 0.3), transparent);
+}
+
+.group-card-body {
+  padding: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.group-card-top {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.group-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(135deg, var(--primary-light), rgba(212, 168, 84, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.group-avatar-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.group-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.group-name {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.group-meta {
+  font-size: 22rpx;
+  color: var(--muted);
+}

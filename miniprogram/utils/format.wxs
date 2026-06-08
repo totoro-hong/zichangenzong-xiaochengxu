@@ -1,0 +1,117 @@
+/**
+ * WXS formatting module for use in WXML
+ * WXS is a subset of JS that can be referenced from WXML
+ */
+
+function formatCurrency(amount) {
+  if (amount === undefined || amount === null) return '¥0';
+  var num = parseFloat(amount);
+  if (isNaN(num)) return '¥0';
+
+  if (num >= 100000000) {
+    return '¥' + (num / 100000000).toFixed(2) + '亿';
+  }
+  if (num >= 10000) {
+    return '¥' + (num / 10000).toFixed(2) + '万';
+  }
+  var intPart = Math.floor(num);
+  var str = intPart.toString();
+  var result = '';
+  var len = str.length;
+  var count = 0;
+  for (var i = len - 1; i >= 0; i--) {
+    if (count > 0 && count % 3 === 0) {
+      result = ',' + result;
+    }
+    result = str.charAt(i) + result;
+    count++;
+  }
+  return '¥' + result;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  var d = getDate(dateStr);
+  var y = d.getFullYear();
+  var m = (d.getMonth() + 1).toString();
+  var day = d.getDate().toString();
+  if (m.length < 2) m = '0' + m;
+  if (day.length < 2) day = '0' + day;
+  return y + '-' + m + '-' + day;
+}
+
+function calcReturnRate(purchaseAmount, currentValue) {
+  if (!purchaseAmount || parseFloat(purchaseAmount) === 0) return '0';
+  var rate = ((parseFloat(currentValue) - parseFloat(purchaseAmount)) / parseFloat(purchaseAmount)) * 100;
+  return rate.toFixed(1);
+}
+
+function getCategoryTotal(assets) {
+  if (!assets || assets.length === 0) return '¥0';
+  var total = 0;
+  for (var i = 0; i < assets.length; i++) {
+    total += parseFloat(assets[i].currentValue || 0);
+  }
+  return formatCurrency(total);
+}
+
+function getCategoryCost(assets) {
+  if (!assets || assets.length === 0) return '¥0';
+  var total = 0;
+  for (var i = 0; i < assets.length; i++) {
+    total += parseFloat(assets[i].purchaseAmount || 0);
+  }
+  return formatCurrency(total);
+}
+
+function getCategoryReturnRate(assets) {
+  if (!assets || assets.length === 0) return 0;
+  var totalValue = 0;
+  var totalCost = 0;
+  for (var i = 0; i < assets.length; i++) {
+    totalValue += parseFloat(assets[i].currentValue || 0);
+    totalCost += parseFloat(assets[i].purchaseAmount || 0);
+  }
+  if (totalCost === 0) return 0;
+  return ((totalValue - totalCost) / totalCost) * 100;
+}
+
+function getCategoryReturnRateStr(assets) {
+  var rate = getCategoryReturnRate(assets);
+  return (rate >= 0 ? '+' : '') + rate.toFixed(1) + '%';
+}
+
+function isReturnPositive(assets) {
+  return getCategoryReturnRate(assets) >= 0;
+}
+
+function getAssetReturn(asset) {
+  if (!asset) return '+0.0%';
+  var rate = calcReturnRate(asset.purchaseAmount, asset.currentValue);
+  var numRate = parseFloat(rate);
+  return (numRate >= 0 ? '+' : '') + rate + '%';
+}
+
+function isAssetReturnPositive(asset) {
+  if (!asset) return true;
+  return (parseFloat(asset.currentValue) - parseFloat(asset.purchaseAmount)) >= 0;
+}
+
+function getFirstChar(str) {
+  if (!str) return '?';
+  return str.charAt(0);
+}
+
+module.exports = {
+  formatCurrency: formatCurrency,
+  formatDate: formatDate,
+  calcReturnRate: calcReturnRate,
+  getCategoryTotal: getCategoryTotal,
+  getCategoryCost: getCategoryCost,
+  getCategoryReturnRate: getCategoryReturnRate,
+  getCategoryReturnRateStr: getCategoryReturnRateStr,
+  isReturnPositive: isReturnPositive,
+  getAssetReturn: getAssetReturn,
+  isAssetReturnPositive: isAssetReturnPositive,
+  getFirstChar: getFirstChar,
+};

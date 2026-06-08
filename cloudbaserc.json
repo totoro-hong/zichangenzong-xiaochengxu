@@ -1,0 +1,35 @@
+{
+  "envId": "cloud1-d9gs37uj5e998acf1",
+  "functions": [
+    {
+      "name": "seedTestData",
+      "timeout": 15,
+      "handler": "index.main",
+      "runtime": "Nodejs18.15"
+    },
+    {
+      "name": "getOpenId",
+      "timeout": 5,
+      "handler": "index.main",
+      "runtime": "Nodejs18.15"
+    },
+    {
+      "name": "getAssetsList",
+      "timeout": 10,
+      "handler": "index.main",
+      "runtime": "Nodejs18.15"
+    },
+    {
+      "name": "diagnose",
+      "timeout": 15,
+      "handler": "index.main",
+      "runtime": "Nodejs18.15"
+    },
+    {
+      "name": "getDashboardData",
+      "timeout": 15,
+      "handler": "index.main",
+      "runtime": "Nodejs18.15"
+    }
+  ]
+}

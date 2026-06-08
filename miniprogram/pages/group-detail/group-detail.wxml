@@ -1,0 +1,66 @@
+<wxs src="../../utils/format.wxs" module="fmt" />
+
+<view class="detail-page">
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <scroll-view wx:elif="{{group}}" class="detail-scroll" scroll-y>
+    <!-- Group hero -->
+    <view class="group-hero glass">
+      <view class="group-hero-avatar">
+        <text>{{fmt.getFirstChar(group.name)}}</text>
+      </view>
+      <text class="group-hero-name">{{group.name}}</text>
+      <view class="group-hero-stats">
+        <view class="hero-stat">
+          <text class="hero-stat-value">{{assetCount}}</text>
+          <text class="hero-stat-label">资产</text>
+        </view>
+        <view class="hero-stat">
+          <text class="hero-stat-value">{{members.length}}</text>
+          <text class="hero-stat-label">成员</text>
+        </view>
+        <view class="hero-stat">
+          <text class="hero-stat-value">{{formattedTotal}}</text>
+          <text class="hero-stat-label">总资产</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Members card -->
+    <view class="members-card glass">
+      <view class="members-header">
+        <text class="section-title">群组成员</text>
+      </view>
+      <view
+        wx:for="{{members}}"
+        wx:key="_id"
+        class="member-row"
+      >
+        <view class="member-left">
+          <view class="member-avatar">
+            <text>{{fmt.getFirstChar(item.nickName || '用户')}}</text>
+          </view>
+          <view class="member-info">
+            <text class="member-name">{{item.nickName || '用户'}}</text>
+            <text class="member-id">ID: {{item.userId.slice(0, 8)}}...</text>
+          </view>
+        </view>
+        <view class="tag {{item.role === 'owner' ? 'tag-primary' : item.role === 'admin' ? 'tag-gold' : 'tag-muted'}}">
+          {{item.role === 'owner' ? '所有者' : item.role === 'admin' ? '管理员' : '成员'}}
+        </view>
+      </view>
+    </view>
+
+    <!-- Invite card -->
+    <view class="invite-card glass" wx:if="{{isOwner}}">
+      <text class="section-title">邀请成员</text>
+      <text class="invite-desc">分享群组信息给好友加入</text>
+      <button class="btn btn-outline btn-small" bindtap="copyInviteInfo" style="margin-top: 16rpx;">
+        复制群组信息
+      </button>
+    </view>
+  </scroll-view>
+</view>

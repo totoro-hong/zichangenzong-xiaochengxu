@@ -1,0 +1,40 @@
+.create-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 24rpx 28rpx 60rpx;
+}
+
+.form-card {
+  margin-bottom: 24rpx;
+}
+
+.form-group {
+  margin-bottom: 12rpx;
+}
+
+.form-hint {
+  font-size: 22rpx;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.error-banner {
+  background: var(--destructive-light);
+  border: 1px solid rgba(231, 76, 76, 0.2);
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 24rpx;
+  font-size: 24rpx;
+  color: var(--destructive);
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 88rpx;
+}

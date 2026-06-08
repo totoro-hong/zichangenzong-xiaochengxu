@@ -1,0 +1,46 @@
+<view class="login-page">
+  <!-- Background orbs -->
+  <view class="bg-orb bg-orb-emerald"></view>
+  <view class="bg-orb bg-orb-gold"></view>
+  <view class="bg-orb bg-orb-teal"></view>
+
+  <view class="login-content">
+    <!-- Logo / Brand area -->
+    <view class="brand-area">
+      <view class="logo-container">
+        <view class="logo-icon">
+          <image src="/images/icon-asset.png" mode="aspectFit" class="logo-img"></image>
+        </view>
+      </view>
+      <text class="brand-title text-gradient">资产跟踪</text>
+      <text class="brand-subtitle">轻松管理你的投资资产</text>
+    </view>
+
+    <!-- Feature highlights -->
+    <view class="feature-list glass">
+      <view class="feature-item">
+        <view class="feature-dot" style="background: #3b9e6e;"></view>
+        <text class="feature-text">多分类资产记录</text>
+      </view>
+      <view class="feature-item">
+        <view class="feature-dot" style="background: #d4a854;"></view>
+        <text class="feature-text">收益变化一目了然</text>
+      </view>
+      <view class="feature-item">
+        <view class="feature-dot" style="background: #5b7fff;"></view>
+        <text class="feature-text">群组共享资产数据</text>
+      </view>
+    </view>
+
+    <!-- Login buttons -->
+    <view class="login-actions">
+      <button class="btn btn-primary login-btn" bindtap="handleLogin" disabled="{{loading}}">
+        <view wx:if="{{loading}}" class="loading-spinner-small"></view>
+        <text wx:if="{{!loading}}">微信一键登录</text>
+        <text wx:elif="{{loading}}">登录中...</text>
+      </button>
+    </view>
+
+    <text class="login-footer">登录即表示同意服务条款</text>
+  </view>
+</view>

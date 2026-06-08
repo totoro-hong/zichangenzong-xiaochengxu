@@ -1,0 +1,150 @@
+<wxs src="../../utils/format.wxs" module="fmt" />
+<wxs src="../../utils/format.wxs" module="calc" />
+
+<view class="dash-page">
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <!-- No groups state -->
+  <view wx:elif="{{!hasGroups}}" class="empty-state">
+    <view class="empty-icon">
+      <image src="/images/placeholder.png" mode="aspectFit" style="width: 64rpx; height: 64rpx; opacity: 0.4;"></image>
+    </view>
+    <text class="empty-title">还没有加入任何群组</text>
+    <text class="empty-desc">创建或加入一个群组来开始跟踪你的资产</text>
+    <view class="mt-8 flex-row gap-4">
+      <button class="btn btn-primary btn-small" bindtap="goToGroups">管理群组</button>
+    </view>
+  </view>
+
+  <!-- Dashboard content -->
+  <view wx:elif="{{hasGroups}}" class="dash-content">
+    <!-- Header -->
+    <view class="dash-header animate-in">
+      <view class="header-left">
+        <text class="header-title text-gradient">资产总览</text>
+        <text class="header-desc">查看你所有资产的综合情况</text>
+      </view>
+      <view class="header-right">
+        <view class="avatar-ring" bindtap="goToGroups">
+          <text class="avatar-text">{{fmt.getFirstChar(nickName)}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Stats cards -->
+    <view class="stats-row">
+      <view class="stats-card-wrapper animate-in animate-in-d1">
+        <view class="stats-card glass">
+          <view class="stats-card-body">
+            <view class="stats-card-header">
+              <text class="stats-label">总资产</text>
+              <view class="stats-icon stats-icon-default">
+                <image src="/images/icon-asset.png" mode="aspectFit" style="width: 36rpx; height: 36rpx; opacity: 0.7;"></image>
+              </view>
+            </view>
+            <text class="stats-value">{{totalValue}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="stats-card-wrapper animate-in animate-in-d2">
+        <view class="stats-card glass">
+          <view class="stats-card-body">
+            <view class="stats-card-header">
+              <text class="stats-label">总收益</text>
+              <view class="stats-icon {{returnPositive ? 'stats-icon-success' : 'stats-icon-danger'}}">
+                <text class="stats-icon-text">{{returnPositive ? '+' : '-'}}</text>
+              </view>
+            </view>
+            <text class="stats-value {{returnPositive ? 'text-emerald' : 'text-red'}}">{{totalReturn}}</text>
+            <text class="stats-suffix {{returnPositive ? 'text-emerald' : 'text-red'}}">收益率 {{returnRate}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Pie chart + Grouped assets -->
+    <view class="content-grid">
+      <!-- Pie chart card -->
+      <view class="chart-card glass animate-in animate-in-d4">
+        <text class="section-title">资产分布</text>
+        <view class="chart-container">
+          <canvas id="pieChart" type="2d" class="pie-canvas"></canvas>
+        </view>
+        <!-- Legend -->
+        <view class="legend-list">
+          <view class="legend-item" wx:for="{{categoryData}}" wx:key="name">
+            <view class="legend-dot" style="background: {{item.color}};"></view>
+            <text class="legend-name">{{item.name}}</text>
+            <text class="legend-value">{{fmt.formatCurrency(item.total)}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Grouped assets -->
+      <view class="grouped-section animate-in animate-in-d5">
+        <view wx:for="{{groupedAssets}}" wx:key="name" class="category-group">
+          <view class="category-group glass">
+            <!-- Category header -->
+            <view class="cat-header">
+              <view class="cat-header-left">
+                <view class="cat-dot" style="background: {{item.color}};"></view>
+                <text class="cat-name">{{item.name}}</text>
+                <text class="cat-count">{{item.assets.length}} 项</text>
+              </view>
+              <view class="cat-stats">
+                <text class="cat-cost">成本 {{calc.getCategoryCost(item.assets)}}</text>
+                <text class="cat-return {{calc.isReturnPositive(item.assets) ? 'text-red' : 'text-emerald'}}">
+                  {{calc.getCategoryReturnRateStr(item.assets)}}
+                </text>
+              </view>
+            </view>
+
+            <!-- Asset items -->
+            <view class="cat-assets">
+              <view
+                wx:for="{{item.assets}}"
+                wx:key="_id"
+                class="asset-item"
+                bindtap="goToAssetEdit"
+                data-id="{{item._id}}"
+              >
+                <view class="asset-item-left">
+                  <view class="asset-avatar">{{fmt.getFirstChar(item.name)}}</view>
+                  <view class="asset-info">
+                    <text class="asset-name">{{item.name}}</text>
+                    <text class="asset-date">{{item.purchaseDate}}</text>
+                  </view>
+                </view>
+                <view class="asset-item-right">
+                  <text class="asset-value">{{fmt.formatCurrency(item.currentValue)}}</text>
+                  <text class="asset-return {{calc.isAssetReturnPositive(item) ? 'text-red' : 'text-emerald'}}">
+                    {{calc.getAssetReturn(item)}}
+                  </text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- View all link -->
+        <view class="view-all" bindtap="goToAssets">
+          <text>查看全部资产 ›</text>
+        </view>
+
+        <!-- Empty assets -->
+        <view wx:if="{{hasGroups && !hasAssets}}" class="empty-state" style="padding: 60rpx 40rpx;">
+          <view class="empty-icon">
+            <image src="/images/placeholder.png" mode="aspectFit" style="width: 48rpx; height: 48rpx; opacity: 0.3;"></image>
+          </view>
+          <text class="empty-title">还没有添加资产</text>
+          <text class="empty-desc">点击下方按钮开始记录你的第一笔资产</text>
+          <button class="btn btn-primary btn-small mt-5" bindtap="goToAssetAdd">添加资产</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,28 @@
+<view class="create-page">
+  <!-- Error -->
+  <view wx:if="{{error}}" class="error-banner">
+    <text>{{error}}</text>
+  </view>
+
+  <view class="card form-card">
+    <view class="form-group">
+      <text class="form-label">群组名称 *</text>
+      <input
+        class="form-input"
+        placeholder="如：家庭资产、投资小分队..."
+        value="{{name}}"
+        bindinput="onInput"
+        maxlength="20"
+      />
+    </view>
+    <text class="form-hint">最多20个字符</text>
+  </view>
+
+  <view class="form-actions">
+    <button class="btn btn-primary submit-btn" bindtap="submit" disabled="{{submitting}}">
+      <view wx:if="{{submitting}}" class="loading-spinner" style="width: 32rpx; height: 32rpx; border-width: 3rpx; margin-right: 12rpx;"></view>
+      <text wx:else>创建群组</text>
+    </button>
+    <button class="btn btn-outline" bindtap="wx.navigateBack">取消</button>
+  </view>
+</view>

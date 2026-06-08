@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "资产跟踪",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {},
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f4f8f6"
+}
