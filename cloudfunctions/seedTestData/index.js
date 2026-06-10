@@ -4,66 +4,49 @@ const db = cloud.database();
 const _ = db.command;
 
 exports.main = async (event) => {
+  const openId = event.openId || (cloud.getWXContext().OPENID);
   var log = [];
-  log.push('=== 开始初始化 ===');
 
-  // 1. Ensure categories exist
-  log.push('检查分类数据...');
-  var catCount = await db.collection('asset_categories').count();
-  log.push('当前分类数量: ' + catCount.total);
-  if (catCount.total === 0) {
-    log.push('创建默认分类...');
-    var cats = [
-      { name: '现金存款', color: '#3b9e6e', icon: 'wallet', order: 1 },
-      { name: '基金理财', color: '#d4a854', icon: 'trending-up', order: 2 },
-      { name: '股票', color: '#e74c4c', icon: 'bar-chart', order: 3 },
-      { name: '房产', color: '#5b7fff', icon: 'home', order: 4 },
-      { name: '其他投资', color: '#9b6bcc', icon: 'more-horizontal', order: 5 },
-    ];
-    for (var ci = 0; ci < cats.length; ci++) {
-      await db.collection('asset_categories').add({ data: cats[ci] });
-    }
-    log.push('已创建 ' + cats.length + ' 个分类');
-  }
+  log.push('为用户 ' + openId + ' 生成测试数据');
 
-  // 2. Get all categories for mapping
+  // 1. Get categories
   var catRes = await db.collection('asset_categories').get();
   var categories = catRes.data;
-  log.push('获取到 ' + categories.length + ' 个分类');
 
-  // 3. Ensure at least one group exists
-  log.push('检查群组数据...');
-  var groupRes = await db.collection('groups').get();
-  var groupId = '';
-  var userId = '';
+  // 2. Find or create group
+  var memberRes = await db.collection('group_members')
+    .where({ userId: openId })
+    .get();
 
-  if (groupRes.data.length > 0) {
-    groupId = groupRes.data[0]._id;
-    log.push('找到已有群组: ' + groupId);
-    // Find a member
-    var memberRes = await db.collection('group_members')
-      .where({ groupId: groupId })
-      .get();
-    if (memberRes.data.length > 0) {
-      userId = memberRes.data[0].userId;
-    } else {
-      userId = 'seed_user_' + Date.now();
-    }
+  var groupId;
+  if (memberRes.data.length > 0) {
+    groupId = memberRes.data[0].groupId;
+    log.push('使用已有群组: ' + groupId);
   } else {
-    log.push('创建测试群组...');
-    userId = 'seed_user_' + Date.now();
-    var newGroup = await db.collection('groups').add({
-      data: { name: '我的资产测试', createdBy: userId, createdAt: db.serverDate() }
+    var groupRes = await db.collection('groups').add({
+      data: { name: '我的资产', createdBy: openId, createdAt: db.serverDate() }
     });
-    groupId = newGroup._id;
+    groupId = groupRes._id;
     await db.collection('group_members').add({
-      data: { groupId: groupId, userId: userId, nickName: '测试用户', role: 'owner', createdAt: db.serverDate() }
+      data: { groupId: groupId, userId: openId, nickName: '用户', role: 'owner', createdAt: db.serverDate() }
     });
-    log.push('已创建测试群组: ' + groupId);
+    log.push('创建新群组: ' + groupId);
   }
 
-  // 4. Seed test assets
-  log.push('开始生成测试资产数据...');
+  // 3. Delete existing assets for this group
+  var existing = await db.collection('assets').where({ groupId: groupId }).count();
+  if (existing.total > 0) {
+    log.push('已有 ' + existing.total + ' 条资产，先清除');
+    while (true) {
+      var oldAssets = await db.collection('assets').where({ groupId: groupId }).limit(20).get();
+      if (oldAssets.data.length === 0) break;
+      for (var i = 0; i < oldAssets.data.length; i++) {
+        await db.collection('assets').doc(oldAssets.data[i]._id).remove();
+      }
+    }
+  }
+
+  // 4. Insert test assets
   var testAssets = [
     { name: '余额宝', ci: 0, cost: 50000, value: 51200, date: '2025-06-01', note: '日常零钱' },
     { name: '零钱通', ci: 0, cost: 30000, value: 30500, date: '2025-08-15', note: '' },
@@ -94,7 +77,7 @@ exports.main = async (event) => {
       await db.collection('assets').add({
         data: {
           groupId: groupId,
-          createdBy: userId,
+          createdBy: openId,
           categoryId: cat._id,
           categoryName: cat.name,
           categoryColor: cat.color,
@@ -113,18 +96,13 @@ exports.main = async (event) => {
     }
   }
 
-  log.push('成功生成 ' + count + ' 条资产');
-  if (errors.length > 0) {
-    log.push('失败: ' + errors.join('; '));
-  }
+  log.push('成功生成 ' + count + ' 条资产数据');
 
   return {
     code: 0,
-    message: '成功生成 ' + count + ' 条测试资产（共 ' + testAssets.length + ' 条）',
-    total: count,
+    message: '成功生成 ' + count + ' 条资产',
     log: log,
     errors: errors,
     groupId: groupId,
-    assetCount: count,
   };
 };

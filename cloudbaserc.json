@@ -30,6 +30,18 @@
       "timeout": 15,
       "handler": "index.main",
       "runtime": "Nodejs18.15"
+    },
+    {
+      "name": "clearAllData",
+      "timeout": 30,
+      "handler": "index.main",
+      "runtime": "Nodejs18.15"
+    },
+    {
+      "name": "initUserGroup",
+      "timeout": 15,
+      "handler": "index.main",
+      "runtime": "Nodejs18.15"
     }
   ]
 }

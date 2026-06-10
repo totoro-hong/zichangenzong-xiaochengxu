@@ -1,0 +1,9 @@
+{
+  "name": "initUserGroup",
+  "version": "1.0.0",
+  "description": "为新用户创建默认群组",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

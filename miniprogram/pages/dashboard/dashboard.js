@@ -6,6 +6,7 @@ const util = require('../../utils/util');
 Page({
   data: {
     loading: true,
+    seeding: false,
     hasGroups: false,
     hasAssets: false,
     // Stats
@@ -183,6 +184,23 @@ Page({
         ctx.lineWidth = 1;
         ctx.stroke();
       });
+  },
+
+  // Seed test data
+  async seedTestData() {
+    this.setData({ seeding: true });
+    try {
+      await wx.cloud.callFunction({
+        name: 'seedTestData',
+        data: { openId: app.globalData.openId },
+      });
+      wx.showToast({ title: '示例数据已生成', icon: 'success' });
+      await this.loadDashboard();
+    } catch (err) {
+      console.error('Seed error:', err);
+      wx.showToast({ title: '生成失败', icon: 'none' });
+      this.setData({ seeding: false });
+    }
   },
 
   // Navigations

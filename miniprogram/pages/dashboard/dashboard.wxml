@@ -136,13 +136,21 @@
         </view>
 
         <!-- Empty assets -->
-        <view wx:if="{{hasGroups && !hasAssets}}" class="empty-state" style="padding: 60rpx 40rpx;">
+        <view wx:if="{{hasGroups && !hasAssets && !seeding}}" class="empty-state" style="padding: 60rpx 40rpx;">
           <view class="empty-icon">
             <image src="/images/placeholder.png" mode="aspectFit" style="width: 48rpx; height: 48rpx; opacity: 0.3;"></image>
           </view>
           <text class="empty-title">还没有添加资产</text>
           <text class="empty-desc">点击下方按钮开始记录你的第一笔资产</text>
-          <button class="btn btn-primary btn-small mt-5" bindtap="goToAssetAdd">添加资产</button>
+          <view class="mt-5 flex-row gap-4">
+            <button class="btn btn-secondary btn-small" bindtap="seedTestData">生成示例数据</button>
+            <button class="btn btn-primary btn-small" bindtap="goToAssetAdd">添加资产</button>
+          </view>
+        </view>
+        <!-- Seeding state -->
+        <view wx:elif="{{hasGroups && !hasAssets && seeding}}" class="empty-state" style="padding: 60rpx 40rpx;">
+          <view class="loading-spinner"></view>
+          <text class="empty-title" style="margin-top: 24rpx;">正在生成示例数据...</text>
         </view>
       </view>
     </view>
