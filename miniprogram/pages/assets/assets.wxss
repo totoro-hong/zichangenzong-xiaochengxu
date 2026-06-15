@@ -214,3 +214,37 @@
   font-weight: 300;
   line-height: 1;
 }
+
+/* ── Guest state ── */
+.guest-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 60rpx 40rpx;
+}
+
+.guest-icon-circle {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(135deg, rgba(59, 158, 110, 0.1), rgba(212, 168, 84, 0.06));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28rpx;
+}
+
+.guest-state-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 12rpx;
+}
+
+.guest-state-desc {
+  font-size: 26rpx;
+  color: var(--muted);
+  text-align: center;
+}

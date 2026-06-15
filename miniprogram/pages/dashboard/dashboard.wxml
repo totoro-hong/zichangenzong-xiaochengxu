@@ -7,6 +7,31 @@
     <view class="loading-spinner"></view>
   </view>
 
+  <!-- Guest mode banner -->
+  <view wx:elif="{{isGuest}}" class="guest-welcome">
+    <view class="guest-icon">
+      <image src="/images/icon-asset.png" mode="aspectFit" style="width: 80rpx; height: 80rpx; opacity: 0.5;"></image>
+    </view>
+    <text class="guest-title">欢迎使用资产跟踪</text>
+    <text class="guest-desc">登录后可管理你的投资资产，记录收益变化，与群组共享数据</text>
+    <view class="guest-features">
+      <view class="guest-feature-item">
+        <view class="gf-dot" style="background: #3b9e6e;"></view>
+        <text>多分类资产记录</text>
+      </view>
+      <view class="guest-feature-item">
+        <view class="gf-dot" style="background: #d4a854;"></view>
+        <text>收益变化一目了然</text>
+      </view>
+      <view class="guest-feature-item">
+        <view class="gf-dot" style="background: #5b7fff;"></view>
+        <text>群组共享资产数据</text>
+      </view>
+    </view>
+    <button class="btn btn-primary btn-medium" bindtap="goToLogin" style="margin-top: 48rpx; width: 70%;">微信一键登录</button>
+    <text class="guest-login-hint" bindtap="goToLogin">已有账号？点击登录</text>
+  </view>
+
   <!-- No groups state -->
   <view wx:elif="{{!hasGroups}}" class="empty-state">
     <view class="empty-icon">

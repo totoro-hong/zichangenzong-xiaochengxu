@@ -32,15 +32,39 @@
       </view>
     </view>
 
+    <!-- Privacy agreement -->
+    <view class="privacy-section glass">
+      <label class="privacy-item" bindtap="toggleAgreeAll">
+        <view class="privacy-checkbox {{agreedAll ? 'checked' : ''}}">
+          <view wx:if="{{agreedAll}}" class="checkmark"></view>
+        </view>
+        <text class="privacy-label">我已阅读并同意</text>
+      </label>
+      <view class="privacy-links">
+        <text class="privacy-link" data-type="service" bindtap="showPrivacyDetail">《用户服务协议》</text>
+        <text class="privacy-sep">及</text>
+        <text class="privacy-link" data-type="privacy" bindtap="showPrivacyDetail">《隐私政策》</text>
+      </view>
+    </view>
+
     <!-- Login buttons -->
     <view class="login-actions">
-      <button class="btn btn-primary login-btn" bindtap="handleLogin" disabled="{{loading}}">
+      <button
+        class="btn btn-primary login-btn"
+        bindtap="handleLogin"
+        disabled="{{loading || !agreedAll}}"
+      >
         <view wx:if="{{loading}}" class="loading-spinner-small"></view>
         <text wx:if="{{!loading}}">微信一键登录</text>
         <text wx:elif="{{loading}}">登录中...</text>
       </button>
-    </view>
 
-    <text class="login-footer">登录即表示同意服务条款</text>
+      <button
+        class="btn btn-secondary quick-btn"
+        bindtap="handleGuestBrowse"
+      >
+        游客浏览
+      </button>
+    </view>
   </view>
 </view>

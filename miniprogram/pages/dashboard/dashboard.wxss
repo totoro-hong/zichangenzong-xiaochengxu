@@ -323,3 +323,78 @@
 .view-all:active {
   color: var(--primary);
 }
+
+/* ── Guest mode ── */
+.guest-welcome {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 48rpx;
+}
+
+.guest-icon {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 36rpx;
+  background: linear-gradient(135deg, rgba(59, 158, 110, 0.12), rgba(212, 168, 84, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+
+.guest-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--foreground);
+  margin-bottom: 16rpx;
+}
+
+.guest-desc {
+  font-size: 26rpx;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+}
+
+.guest-features {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 32rpx 36rpx;
+  background: rgba(255,255,255,0.5);
+  border-radius: 20rpx;
+  backdrop-filter: blur(10px);
+}
+
+.guest-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  font-size: 28rpx;
+  color: var(--foreground);
+}
+
+.guest-feature-item + .guest-feature-item {
+  border-top: 1px solid var(--sidebar-border);
+  padding-top: 24rpx;
+}
+
+.gf-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.guest-login-hint {
+  font-size: 24rpx;
+  color: var(--muted);
+  margin-top: 24rpx;
+  text-decoration: underline;
+}

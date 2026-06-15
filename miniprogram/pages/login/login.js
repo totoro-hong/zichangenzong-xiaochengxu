@@ -1,19 +1,48 @@
 const app = getApp();
+const { SERVICE_AGREEMENT, PRIVACY_POLICY } = require('../../utils/agreements');
 
 Page({
   data: {
     loading: false,
+    agreedAll: false,
   },
 
   onLoad() {
-    // Auto-login if already logged in
+    // If already logged in, skip login page
     if (app.globalData.hasLogin) {
       wx.reLaunch({ url: '/pages/dashboard/dashboard' });
     }
   },
 
+  toggleAgreeAll() {
+    this.setData({ agreedAll: !this.data.agreedAll });
+  },
+
+  showPrivacyDetail(e) {
+    const type = e.currentTarget.dataset.type;
+    const titles = { service: '用户服务协议', privacy: '隐私政策' };
+    const contents = { service: SERVICE_AGREEMENT, privacy: PRIVACY_POLICY };
+    wx.showModal({
+      title: titles[type] || '协议',
+      content: contents[type] || '',
+      showCancel: true,
+      cancelText: '关闭',
+      confirmText: '同意',
+      success: (res) => {
+        if (res.confirm) {
+          this.setData({ agreedAll: true });
+        }
+      },
+    });
+  },
+
   async handleLogin() {
     const that = this;
+    if (!this.data.agreedAll) {
+      wx.showToast({ title: '请先阅读并同意协议', icon: 'none' });
+      return;
+    }
+
     that.setData({ loading: true });
 
     try {
@@ -47,5 +76,10 @@ Page({
       wx.showToast({ title: '登录失败', icon: 'none' });
       that.setData({ loading: false });
     }
+  },
+
+  handleGuestBrowse() {
+    app.setGuestMode();
+    wx.reLaunch({ url: '/pages/dashboard/dashboard' });
   },
 });

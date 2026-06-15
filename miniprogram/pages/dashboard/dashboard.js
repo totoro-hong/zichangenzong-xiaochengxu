@@ -5,7 +5,8 @@ const util = require('../../utils/util');
 
 Page({
   data: {
-    loading: true,
+    loading: false,
+    isGuest: false,
     seeding: false,
     hasGroups: false,
     hasAssets: false,
@@ -26,17 +27,28 @@ Page({
   },
 
   async onShow() {
+    // Check guest mode
+    if (app.globalData.isGuest) {
+      this.setData({ isGuest: true, loading: false });
+      return;
+    }
+
     if (!app.globalData.hasLogin) {
       wx.reLaunch({ url: '/pages/login/login' });
       return;
     }
 
     this.setData({
+      isGuest: false,
       nickName: app.globalData.userInfo?.nickName || '用户',
       avatarUrl: app.globalData.userInfo?.avatarUrl || '',
     });
 
     await this.loadDashboard();
+  },
+
+  goToLogin() {
+    wx.reLaunch({ url: '/pages/login/login' });
   },
 
   async loadDashboard() {
@@ -205,6 +217,10 @@ Page({
 
   // Navigations
   goToAssetAdd() {
+    if (app.globalData.isGuest) {
+      wx.showToast({ title: '请先登录后再添加资产', icon: 'none' });
+      return;
+    }
     wx.navigateTo({ url: '/pages/asset-add/asset-add' });
   },
 
@@ -213,15 +229,27 @@ Page({
   },
 
   goToAssetEdit(e) {
+    if (app.globalData.isGuest) {
+      wx.showToast({ title: '请先登录后再编辑资产', icon: 'none' });
+      return;
+    }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/asset-edit/asset-edit?id=${id}` });
   },
 
   goToGroups() {
+    if (app.globalData.isGuest) {
+      wx.showToast({ title: '请先登录后再管理群组', icon: 'none' });
+      return;
+    }
     wx.navigateTo({ url: '/pages/groups/groups' });
   },
 
   goToGroupDetail(e) {
+    if (app.globalData.isGuest) {
+      wx.showToast({ title: '请先登录后再查看群组', icon: 'none' });
+      return;
+    }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/group-detail/group-detail?id=${id}` });
   },

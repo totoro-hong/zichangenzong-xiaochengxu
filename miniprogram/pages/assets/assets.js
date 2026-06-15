@@ -3,7 +3,8 @@ const util = require('../../utils/util');
 
 Page({
   data: {
-    loading: true,
+    loading: false,
+    isGuest: false,
     assets: [],
     filteredAssets: [],
     searchKeyword: '',
@@ -14,11 +15,23 @@ Page({
   },
 
   async onShow() {
+    // Check guest mode
+    if (app.globalData.isGuest) {
+      this.setData({ isGuest: true, loading: false });
+      return;
+    }
+
     if (!app.globalData.hasLogin) {
       wx.reLaunch({ url: '/pages/login/login' });
       return;
     }
+
+    this.setData({ isGuest: false });
     await this.loadData();
+  },
+
+  goToLogin() {
+    wx.reLaunch({ url: '/pages/login/login' });
   },
 
   async loadData() {
@@ -95,15 +108,27 @@ Page({
   },
 
   goToAssetAdd() {
+    if (app.globalData.isGuest) {
+      wx.showToast({ title: '请先登录后再添加资产', icon: 'none' });
+      return;
+    }
     wx.navigateTo({ url: '/pages/asset-add/asset-add' });
   },
 
   goToAssetEdit(e) {
+    if (app.globalData.isGuest) {
+      wx.showToast({ title: '请先登录后再编辑资产', icon: 'none' });
+      return;
+    }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/asset-edit/asset-edit?id=${id}` });
   },
 
   goToAssetDetail(e) {
+    if (app.globalData.isGuest) {
+      wx.showToast({ title: '请先登录后再查看详情', icon: 'none' });
+      return;
+    }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/asset-detail/asset-detail?id=${id}` });
   },
