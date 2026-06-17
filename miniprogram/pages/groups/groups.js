@@ -9,7 +9,10 @@ Page({
 
   onShow() {
     if (!app.globalData.hasLogin) {
-      wx.reLaunch({ url: '/pages/login/login' });
+      wx.showToast({ title: '请先登录后再管理群组', icon: 'none' });
+      setTimeout(() => {
+        wx.navigateTo({ url: '/pages/login/login' });
+      }, 500);
       return;
     }
     this.loadGroups();
@@ -35,5 +38,9 @@ Page({
 
   goToGroupCreate() {
     wx.navigateTo({ url: '/pages/group-create/group-create' });
+  },
+
+  goToGroupJoin() {
+    wx.navigateTo({ url: '/pages/group-join/group-join' });
   },
 });

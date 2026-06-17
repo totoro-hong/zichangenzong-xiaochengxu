@@ -7,175 +7,159 @@
     <view class="loading-spinner"></view>
   </view>
 
-  <!-- Guest mode banner -->
-  <view wx:elif="{{isGuest}}" class="guest-welcome">
-    <view class="guest-icon">
-      <image src="/images/icon-asset.png" mode="aspectFit" style="width: 80rpx; height: 80rpx; opacity: 0.5;"></image>
-    </view>
-    <text class="guest-title">欢迎使用资产跟踪</text>
-    <text class="guest-desc">登录后可管理你的投资资产，记录收益变化，与群组共享数据</text>
-    <view class="guest-features">
-      <view class="guest-feature-item">
-        <view class="gf-dot" style="background: #3b9e6e;"></view>
-        <text>多分类资产记录</text>
-      </view>
-      <view class="guest-feature-item">
-        <view class="gf-dot" style="background: #d4a854;"></view>
-        <text>收益变化一目了然</text>
-      </view>
-      <view class="guest-feature-item">
-        <view class="gf-dot" style="background: #5b7fff;"></view>
-        <text>群组共享资产数据</text>
-      </view>
-    </view>
-    <button class="btn btn-primary btn-medium" bindtap="goToLogin" style="margin-top: 48rpx; width: 70%;">微信一键登录</button>
-    <text class="guest-login-hint" bindtap="goToLogin">已有账号？点击登录</text>
-  </view>
-
-  <!-- No groups state -->
-  <view wx:elif="{{!hasGroups}}" class="empty-state">
-    <view class="empty-icon">
-      <image src="/images/placeholder.png" mode="aspectFit" style="width: 64rpx; height: 64rpx; opacity: 0.4;"></image>
-    </view>
-    <text class="empty-title">还没有加入任何群组</text>
-    <text class="empty-desc">创建或加入一个群组来开始跟踪你的资产</text>
-    <view class="mt-8 flex-row gap-4">
-      <button class="btn btn-primary btn-small" bindtap="goToGroups">管理群组</button>
-    </view>
-  </view>
-
-  <!-- Dashboard content -->
-  <view wx:elif="{{hasGroups}}" class="dash-content">
-    <!-- Header -->
-    <view class="dash-header animate-in">
-      <view class="header-left">
-        <text class="header-title text-gradient">资产总览</text>
-        <text class="header-desc">查看你所有资产的综合情况</text>
-      </view>
-      <view class="header-right">
-        <view class="avatar-ring" bindtap="goToGroups">
-          <text class="avatar-text">{{fmt.getFirstChar(nickName)}}</text>
+  <view wx:else>
+    <!-- Guest login banner -->
+    <view wx:if="{{isGuest}}" class="guest-banner">
+      <view class="guest-banner-inner">
+        <view class="guest-banner-left">
+          <view class="guest-banner-icon">
+            <image src="/images/icon-asset.png" mode="aspectFit" style="width: 32rpx; height: 32rpx; opacity: 0.6;" />
+          </view>
+          <view class="guest-banner-texts">
+            <text class="guest-banner-title">登录后可管理你的资产</text>
+            <text class="guest-banner-desc">跟踪收益变化，与群组共享数据</text>
+          </view>
         </view>
+        <button class="btn btn-primary btn-small" bindtap="goToLogin">去登录</button>
       </view>
     </view>
 
-    <!-- Stats cards -->
-    <view class="stats-row">
-      <view class="stats-card-wrapper animate-in animate-in-d1">
-        <view class="stats-card glass">
-          <view class="stats-card-body">
-            <view class="stats-card-header">
-              <text class="stats-label">总资产</text>
-              <view class="stats-icon stats-icon-default">
-                <image src="/images/icon-asset.png" mode="aspectFit" style="width: 36rpx; height: 36rpx; opacity: 0.7;"></image>
-              </view>
-            </view>
-            <text class="stats-value">{{totalValue}}</text>
+    <!-- Main content area -->
+    <view class="dash-content">
+      <!-- Header -->
+      <view class="dash-header animate-in">
+        <view class="header-left">
+          <text class="header-title text-gradient">资产总览</text>
+          <text class="header-desc">查看你所有资产的综合情况</text>
+        </view>
+        <view wx:if="{{!isGuest}}" class="header-right">
+          <view class="avatar-ring" bindtap="goToGroups">
+            <text class="avatar-text">{{fmt.getFirstChar(nickName)}}</text>
           </view>
         </view>
       </view>
 
-      <view class="stats-card-wrapper animate-in animate-in-d2">
-        <view class="stats-card glass">
-          <view class="stats-card-body">
-            <view class="stats-card-header">
-              <text class="stats-label">总收益</text>
-              <view class="stats-icon {{returnPositive ? 'stats-icon-success' : 'stats-icon-danger'}}">
-                <text class="stats-icon-text">{{returnPositive ? '+' : '-'}}</text>
+      <!-- Stats cards -->
+      <view class="stats-row">
+        <view class="stats-card-wrapper animate-in animate-in-d1">
+          <view class="stats-card glass">
+            <view class="stats-card-body">
+              <view class="stats-card-header">
+                <text class="stats-label">总资产</text>
+                <view class="stats-icon stats-icon-default">
+                  <image src="/images/icon-asset.png" mode="aspectFit" style="width: 36rpx; height: 36rpx; opacity: 0.7;" />
+                </view>
               </view>
+              <text class="stats-value">{{totalValue}}</text>
             </view>
-            <text class="stats-value {{returnPositive ? 'text-emerald' : 'text-red'}}">{{totalReturn}}</text>
-            <text class="stats-suffix {{returnPositive ? 'text-emerald' : 'text-red'}}">收益率 {{returnRate}}</text>
+          </view>
+        </view>
+
+        <view class="stats-card-wrapper animate-in animate-in-d2">
+          <view class="stats-card glass">
+            <view class="stats-card-body">
+              <view class="stats-card-header">
+                <text class="stats-label">总收益</text>
+                <view class="stats-icon {{returnPositive ? 'stats-icon-danger' : 'stats-icon-success'}}">
+                  <text class="stats-icon-text">{{returnPositive ? '+' : '-'}}</text>
+                </view>
+              </view>
+              <text class="stats-value {{returnPositive ? 'text-red' : 'text-emerald'}}">{{totalReturn}}</text>
+              <text class="stats-suffix {{returnPositive ? 'text-red' : 'text-emerald'}}">收益率 {{returnRate}}</text>
+            </view>
           </view>
         </view>
       </view>
-    </view>
 
-    <!-- Pie chart + Grouped assets -->
-    <view class="content-grid">
-      <!-- Pie chart card -->
-      <view class="chart-card glass animate-in animate-in-d4">
-        <text class="section-title">资产分布</text>
-        <view class="chart-container">
-          <canvas id="pieChart" type="2d" class="pie-canvas"></canvas>
+      <!-- No groups state -->
+      <view wx:if="{{!hasGroups}}" class="empty-state">
+        <view class="empty-icon">
+          <image src="/images/placeholder.png" mode="aspectFit" style="width: 64rpx; height: 64rpx; opacity: 0.4;" />
         </view>
-        <!-- Legend -->
-        <view class="legend-list">
-          <view class="legend-item" wx:for="{{categoryData}}" wx:key="name">
-            <view class="legend-dot" style="background: {{item.color}};"></view>
-            <text class="legend-name">{{item.name}}</text>
-            <text class="legend-value">{{fmt.formatCurrency(item.total)}}</text>
-          </view>
+        <text class="empty-title">
+          {{isGuest ? '登录后开始跟踪你的资产' : '还没有加入任何群组'}}
+        </text>
+        <text class="empty-desc">
+          {{isGuest ? '一键登录即可创建群组并记录你的投资资产' : '创建或加入一个群组来开始跟踪你的资产'}}
+        </text>
+        <view class="mt-8">
+          <button class="btn btn-primary btn-small" bindtap="{{isGuest ? 'goToLogin' : 'goToGroups'}}">
+            {{isGuest ? '微信一键登录' : '管理群组'}}
+          </button>
         </view>
       </view>
 
-      <!-- Grouped assets -->
-      <view class="grouped-section animate-in animate-in-d5">
-        <view wx:for="{{groupedAssets}}" wx:key="name" class="category-group">
-          <view class="category-group glass">
-            <!-- Category header -->
-            <view class="cat-header">
-              <view class="cat-header-left">
-                <view class="cat-dot" style="background: {{item.color}};"></view>
-                <text class="cat-name">{{item.name}}</text>
-                <text class="cat-count">{{item.assets.length}} 项</text>
-              </view>
-              <view class="cat-stats">
-                <text class="cat-cost">成本 {{calc.getCategoryCost(item.assets)}}</text>
-                <text class="cat-return {{calc.isReturnPositive(item.assets) ? 'text-red' : 'text-emerald'}}">
-                  {{calc.getCategoryReturnRateStr(item.assets)}}
-                </text>
+      <!-- Dashboard content (authenticated, with data) -->
+      <view wx:elif="{{hasGroups}}">
+        <view class="content-grid">
+          <view class="chart-card glass animate-in animate-in-d4">
+            <text class="section-title">资产分布</text>
+            <view class="chart-container">
+              <canvas id="pieChart" type="2d" class="pie-canvas" />
+            </view>
+            <view class="legend-list">
+              <view class="legend-item" wx:for="{{categoryData}}" wx:key="name">
+                <view class="legend-dot" style="background: {{item.color}};" />
+                <text class="legend-name">{{item.name}}</text>
+                <text class="legend-value">{{fmt.formatCurrency(item.total)}}</text>
               </view>
             </view>
+          </view>
 
-            <!-- Asset items -->
-            <view class="cat-assets">
-              <view
-                wx:for="{{item.assets}}"
-                wx:key="_id"
-                class="asset-item"
-                bindtap="goToAssetEdit"
-                data-id="{{item._id}}"
-              >
-                <view class="asset-item-left">
-                  <view class="asset-avatar">{{fmt.getFirstChar(item.name)}}</view>
-                  <view class="asset-info">
-                    <text class="asset-name">{{item.name}}</text>
-                    <text class="asset-date">{{item.purchaseDate}}</text>
+          <view class="grouped-section animate-in animate-in-d5">
+            <view wx:for="{{groupedAssets}}" wx:key="name" class="category-group">
+              <view class="category-group glass">
+                <view class="cat-header">
+                  <view class="cat-header-left">
+                    <view class="cat-dot" style="background: {{item.color}};" />
+                    <text class="cat-name">{{item.name}}</text>
+                    <text class="cat-count">{{item.assets.length}} 项</text>
+                  </view>
+                  <view class="cat-stats">
+                    <text class="cat-cost">成本 {{calc.getCategoryCost(item.assets)}}</text>
+                    <text class="cat-return {{calc.isReturnPositive(item.assets) ? 'text-red' : 'text-emerald'}}">{{calc.getCategoryReturnRateStr(item.assets)}}</text>
                   </view>
                 </view>
-                <view class="asset-item-right">
-                  <text class="asset-value">{{fmt.formatCurrency(item.currentValue)}}</text>
-                  <text class="asset-return {{calc.isAssetReturnPositive(item) ? 'text-red' : 'text-emerald'}}">
-                    {{calc.getAssetReturn(item)}}
-                  </text>
+
+                <view class="cat-assets">
+                  <view wx:for="{{item.assets}}" wx:key="_id" class="asset-item" bindtap="goToAssetEdit" data-id="{{item._id}}">
+                    <view class="asset-item-left">
+                      <view class="asset-avatar">{{fmt.getFirstChar(item.name)}}</view>
+                      <view class="asset-info">
+                        <text class="asset-name">{{item.name}}</text>
+                        <text class="asset-date">{{item.purchaseDate}}</text>
+                      </view>
+                    </view>
+                    <view class="asset-item-right">
+                      <text class="asset-value">{{fmt.formatCurrency(item.currentValue)}}</text>
+                      <text class="asset-return {{calc.isAssetReturnPositive(item) ? 'text-red' : 'text-emerald'}}">{{calc.getAssetReturn(item)}}</text>
+                    </view>
+                  </view>
                 </view>
               </view>
             </view>
-          </view>
-        </view>
 
-        <!-- View all link -->
-        <view class="view-all" bindtap="goToAssets">
-          <text>查看全部资产 ›</text>
-        </view>
+            <view class="view-all" bindtap="goToAssets">
+              <text>查看全部资产 ›</text>
+            </view>
 
-        <!-- Empty assets -->
-        <view wx:if="{{hasGroups && !hasAssets && !seeding}}" class="empty-state" style="padding: 60rpx 40rpx;">
-          <view class="empty-icon">
-            <image src="/images/placeholder.png" mode="aspectFit" style="width: 48rpx; height: 48rpx; opacity: 0.3;"></image>
+            <view wx:if="{{hasGroups && !hasAssets && !seeding}}" class="empty-state" style="padding: 60rpx 40rpx;">
+              <view class="empty-icon">
+                <image src="/images/placeholder.png" mode="aspectFit" style="width: 48rpx; height: 48rpx; opacity: 0.3;" />
+              </view>
+              <text class="empty-title">还没有添加资产</text>
+              <text class="empty-desc">点击下方按钮开始记录你的第一笔资产</text>
+              <view class="mt-5 flex-row gap-4">
+                <button class="btn btn-secondary btn-small" bindtap="seedTestData">生成示例数据</button>
+                <button class="btn btn-primary btn-small" bindtap="goToAssetAdd">添加资产</button>
+              </view>
+            </view>
+
+            <view wx:elif="{{hasGroups && !hasAssets && seeding}}" class="empty-state" style="padding: 60rpx 40rpx;">
+              <view class="loading-spinner" />
+              <text class="empty-title" style="margin-top: 24rpx;">正在生成示例数据...</text>
+            </view>
           </view>
-          <text class="empty-title">还没有添加资产</text>
-          <text class="empty-desc">点击下方按钮开始记录你的第一笔资产</text>
-          <view class="mt-5 flex-row gap-4">
-            <button class="btn btn-secondary btn-small" bindtap="seedTestData">生成示例数据</button>
-            <button class="btn btn-primary btn-small" bindtap="goToAssetAdd">添加资产</button>
-          </view>
-        </view>
-        <!-- Seeding state -->
-        <view wx:elif="{{hasGroups && !hasAssets && seeding}}" class="empty-state" style="padding: 60rpx 40rpx;">
-          <view class="loading-spinner"></view>
-          <text class="empty-title" style="margin-top: 24rpx;">正在生成示例数据...</text>
         </view>
       </view>
     </view>

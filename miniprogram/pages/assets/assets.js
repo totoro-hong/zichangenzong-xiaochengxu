@@ -15,14 +15,10 @@ Page({
   },
 
   async onShow() {
-    // Check guest mode
-    if (app.globalData.isGuest) {
-      this.setData({ isGuest: true, loading: false });
-      return;
-    }
-
+    // Not logged in — auto treat as guest so user can browse first
     if (!app.globalData.hasLogin) {
-      wx.reLaunch({ url: '/pages/login/login' });
+      app.setGuestMode();
+      this.setData({ isGuest: true, loading: false });
       return;
     }
 

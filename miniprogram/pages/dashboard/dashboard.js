@@ -27,14 +27,10 @@ Page({
   },
 
   async onShow() {
-    // Check guest mode
-    if (app.globalData.isGuest) {
-      this.setData({ isGuest: true, loading: false });
-      return;
-    }
-
+    // Not logged in — auto treat as guest so user can browse first
     if (!app.globalData.hasLogin) {
-      wx.reLaunch({ url: '/pages/login/login' });
+      app.setGuestMode();
+      this.setData({ isGuest: true, loading: false });
       return;
     }
 
@@ -86,7 +82,7 @@ Page({
         hasGroups: true,
         hasAssets: dashData.assets.length > 0,
         totalValue: fmt(dashData.totalValue),
-        totalReturn: (returnPositive ? '+' : '') + fmt(Math.abs(dashData.totalReturn)),
+        totalReturn: fmt(dashData.totalReturn),
         returnRate: (returnPositive ? '+' : '') + dashData.returnRate.toFixed(1) + '%',
         returnPositive,
         categoryData: dashData.categoryData,

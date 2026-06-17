@@ -215,36 +215,54 @@
   line-height: 1;
 }
 
-/* ── Guest state ── */
-.guest-state {
+/* ── Guest banner ── */
+.guest-banner {
+  padding: 0 0 16rpx;
+}
+
+.guest-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, rgba(59, 158, 110, 0.08), rgba(59, 158, 110, 0.03));
+  border: 1px solid rgba(59, 158, 110, 0.15);
+  border-radius: 20rpx;
+}
+
+.guest-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.guest-banner-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 14rpx;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guest-banner-texts {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  padding: 60rpx 40rpx;
+  gap: 4rpx;
+  min-width: 0;
 }
 
-.guest-icon-circle {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 30rpx;
-  background: linear-gradient(135deg, rgba(59, 158, 110, 0.1), rgba(212, 168, 84, 0.06));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 28rpx;
-}
-
-.guest-state-title {
-  font-size: 32rpx;
+.guest-banner-title {
+  font-size: 26rpx;
   font-weight: 600;
   color: var(--foreground);
-  margin-bottom: 12rpx;
 }
 
-.guest-state-desc {
-  font-size: 26rpx;
+.guest-banner-desc {
+  font-size: 22rpx;
   color: var(--muted);
-  text-align: center;
 }

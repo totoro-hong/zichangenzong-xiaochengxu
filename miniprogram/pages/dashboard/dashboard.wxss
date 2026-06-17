@@ -324,77 +324,54 @@
   color: var(--primary);
 }
 
-/* ── Guest mode ── */
-.guest-welcome {
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60rpx 48rpx;
+/* ── Guest banner ── */
+.guest-banner {
+  padding: 20rpx 28rpx;
 }
 
-.guest-icon {
-  width: 140rpx;
-  height: 140rpx;
-  border-radius: 36rpx;
-  background: linear-gradient(135deg, rgba(59, 158, 110, 0.12), rgba(212, 168, 84, 0.08));
+.guest-banner-inner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 32rpx;
-}
-
-.guest-title {
-  font-size: 40rpx;
-  font-weight: 700;
-  font-family: var(--font-heading);
-  color: var(--foreground);
-  margin-bottom: 16rpx;
-}
-
-.guest-desc {
-  font-size: 26rpx;
-  color: var(--muted);
-  text-align: center;
-  line-height: 1.6;
-  margin-bottom: 40rpx;
-}
-
-.guest-features {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-  padding: 32rpx 36rpx;
-  background: rgba(255,255,255,0.5);
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, rgba(59, 158, 110, 0.08), rgba(59, 158, 110, 0.03));
+  border: 1px solid rgba(59, 158, 110, 0.15);
   border-radius: 20rpx;
-  backdrop-filter: blur(10px);
 }
 
-.guest-feature-item {
+.guest-banner-left {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  font-size: 28rpx;
-  color: var(--foreground);
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
 }
 
-.guest-feature-item + .guest-feature-item {
-  border-top: 1px solid var(--sidebar-border);
-  padding-top: 24rpx;
-}
-
-.gf-dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
+.guest-banner-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 14rpx;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.guest-login-hint {
-  font-size: 24rpx;
+.guest-banner-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.guest-banner-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.guest-banner-desc {
+  font-size: 22rpx;
   color: var(--muted);
-  margin-top: 24rpx;
-  text-decoration: underline;
 }

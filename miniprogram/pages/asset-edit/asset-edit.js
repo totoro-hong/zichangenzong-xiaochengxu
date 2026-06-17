@@ -29,7 +29,10 @@ Page({
 
   async onLoad(options) {
     if (!app.globalData.hasLogin) {
-      wx.reLaunch({ url: '/pages/login/login' });
+      wx.showToast({ title: '请先登录后再编辑资产', icon: 'none' });
+      setTimeout(() => {
+        wx.navigateTo({ url: '/pages/login/login' });
+      }, 500);
       return;
     }
 

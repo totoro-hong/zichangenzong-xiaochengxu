@@ -26,6 +26,15 @@ Page({
     if (this.data.submitting) return;
     this.setData({ submitting: true, error: '' });
 
+    if (!app.globalData.hasLogin) {
+      this.setData({ submitting: false });
+      wx.showToast({ title: '请先登录后再创建群组', icon: 'none' });
+      setTimeout(() => {
+        wx.navigateTo({ url: '/pages/login/login' });
+      }, 500);
+      return;
+    }
+
     try {
       const openId = app.globalData.openId;
       const nickName = app.globalData.userInfo?.nickName || '用户';

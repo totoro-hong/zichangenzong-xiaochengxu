@@ -28,7 +28,10 @@ Page({
 
   async onLoad() {
     if (!app.globalData.hasLogin) {
-      wx.reLaunch({ url: '/pages/login/login' });
+      wx.showToast({ title: '请先登录后再添加资产', icon: 'none' });
+      setTimeout(() => {
+        wx.navigateTo({ url: '/pages/login/login' });
+      }, 500);
       return;
     }
 

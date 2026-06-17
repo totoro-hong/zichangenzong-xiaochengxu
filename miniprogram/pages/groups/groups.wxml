@@ -2,7 +2,10 @@
   <!-- Header -->
   <view class="groups-header">
     <text class="page-title">我的群组</text>
-    <view class="btn btn-primary btn-small" bindtap="goToGroupCreate">创建群组</view>
+    <view class="groups-header-actions">
+      <view class="btn btn-outline btn-small" bindtap="goToGroupJoin">加入群组</view>
+      <view class="btn btn-primary btn-small" bindtap="goToGroupCreate">创建群组</view>
+    </view>
   </view>
 
   <!-- Loading -->
@@ -16,7 +19,7 @@
       <image src="/images/placeholder.png" mode="aspectFit" style="width: 56rpx; height: 56rpx; opacity: 0.3;"></image>
     </view>
     <text class="empty-title">还没有群组</text>
-    <text class="empty-desc">创建一个群组与家人朋友共享资产</text>
+    <text class="empty-desc">创建或加入一个群组，与家人朋友共享资产</text>
   </view>
 
   <!-- Group list -->

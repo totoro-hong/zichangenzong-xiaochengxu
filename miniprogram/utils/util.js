@@ -5,14 +5,16 @@ function formatCurrency(amount) {
   if (amount === undefined || amount === null) return '¥0';
   const num = Number(amount);
   if (isNaN(num)) return '¥0';
+  const abs = Math.abs(num);
+  const prefix = num < 0 ? '-¥' : '¥';
 
-  if (num >= 100000000) {
-    return '¥' + (num / 100000000).toFixed(2) + '亿';
+  if (abs >= 100000000) {
+    return prefix + (abs / 100000000).toFixed(2) + '亿';
   }
-  if (num >= 10000) {
-    return '¥' + (num / 10000).toFixed(2) + '万';
+  if (abs >= 10000) {
+    return prefix + (abs / 10000).toFixed(2) + '万';
   }
-  return '¥' + num.toLocaleString('zh-CN', {
+  return prefix + abs.toLocaleString('zh-CN', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   });

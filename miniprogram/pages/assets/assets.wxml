@@ -2,14 +2,20 @@
 <wxs src="../../utils/format.wxs" module="calc" />
 
 <view class="assets-page">
-  <!-- Guest mode -->
-  <view wx:if="{{isGuest}}" class="guest-state">
-    <view class="guest-icon-circle">
-      <image src="/images/icon-asset.png" mode="aspectFit" style="width: 64rpx; height: 64rpx; opacity: 0.4;"></image>
+  <!-- Guest banner -->
+  <view wx:if="{{isGuest}}" class="guest-banner">
+    <view class="guest-banner-inner">
+      <view class="guest-banner-left">
+        <view class="guest-banner-icon">
+          <image src="/images/icon-asset.png" mode="aspectFit" style="width: 32rpx; height: 32rpx; opacity: 0.6;"></image>
+        </view>
+        <view class="guest-banner-texts">
+          <text class="guest-banner-title">登录后可查看和管理资产</text>
+          <text class="guest-banner-desc">查看收益变化，管理你的投资记录</text>
+        </view>
+      </view>
+      <button class="btn btn-primary btn-small" bindtap="goToLogin" style="flex-shrink: 0;">去登录</button>
     </view>
-    <text class="guest-state-title">登录后可查看资产</text>
-    <text class="guest-state-desc">登录后即可查看和管理你的所有资产记录</text>
-    <button class="btn btn-primary btn-medium" bindtap="goToLogin" style="margin-top: 36rpx; width: 60%;">微信一键登录</button>
   </view>
 
   <!-- Search bar -->

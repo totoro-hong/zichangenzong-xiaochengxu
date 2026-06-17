@@ -6,6 +6,12 @@
     <view class="loading-spinner"></view>
   </view>
 
+  <!-- Join success animation -->
+  <view wx:elif="{{joinSuccess}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text style="margin-top: 24rpx; color: var(--muted); font-size: 26rpx;">加载群组数据...</text>
+  </view>
+
   <scroll-view wx:elif="{{group}}" class="detail-scroll" scroll-y>
     <!-- Group hero -->
     <view class="group-hero glass">
@@ -29,7 +35,16 @@
       </view>
     </view>
 
-    <!-- Members card -->
+    <!-- Join prompt for non-members -->
+    <view wx:if="{{!isMember}}" class="join-card glass">
+      <text class="join-card-title">你还未加入此群组</text>
+      <text class="join-card-desc">加入后可查看和编辑群组内的资产数据</text>
+      <button class="btn btn-primary btn-medium" bindtap="handleJoinGroup" disabled="{{joining}}" style="width: 80%; margin-top: 24rpx;">
+        {{joining ? '加入中...' : '加入群组'}}
+      </button>
+    </view>
+
+    <!-- Members card (show for both members and non-members) -->
     <view class="members-card glass">
       <view class="members-header">
         <text class="section-title">群组成员</text>
@@ -54,13 +69,18 @@
       </view>
     </view>
 
-    <!-- Invite card -->
-    <view class="invite-card glass" wx:if="{{isOwner}}">
+    <!-- Invite card (only for members) -->
+    <view wx:if="{{isMember}}" class="invite-card glass">
       <text class="section-title">邀请成员</text>
-      <text class="invite-desc">分享群组信息给好友加入</text>
-      <button class="btn btn-outline btn-small" bindtap="copyInviteInfo" style="margin-top: 16rpx;">
-        复制群组信息
-      </button>
+      <text class="invite-desc">分享给好友或复制信息邀请加入</text>
+      <view class="invite-actions">
+        <button class="btn btn-primary btn-small" open-type="share" style="flex: 1;">
+          分享给微信好友
+        </button>
+        <button class="btn btn-outline btn-small" bindtap="copyInviteInfo" style="flex: 1;">
+          复制群组信息
+        </button>
+      </view>
     </view>
   </scroll-view>
 </view>

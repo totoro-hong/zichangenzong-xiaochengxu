@@ -69,7 +69,7 @@ Page({
 
       wx.showToast({ title: '登录成功', icon: 'success' });
       setTimeout(() => {
-        wx.reLaunch({ url: '/pages/dashboard/dashboard' });
+        wx.navigateBack({ fail: () => wx.reLaunch({ url: '/pages/dashboard/dashboard' }) });
       }, 500);
     } catch (err) {
       console.error('Login error:', err);
@@ -78,8 +78,8 @@ Page({
     }
   },
 
-  handleGuestBrowse() {
+  handleCancelLogin() {
     app.setGuestMode();
-    wx.reLaunch({ url: '/pages/dashboard/dashboard' });
+    wx.navigateBack({ fail: () => wx.reLaunch({ url: '/pages/dashboard/dashboard' }) });
   },
 });

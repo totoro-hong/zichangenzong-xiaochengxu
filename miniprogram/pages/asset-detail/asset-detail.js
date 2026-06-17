@@ -18,6 +18,13 @@ Page({
   },
 
   onLoad(options) {
+    if (!app.globalData.hasLogin) {
+      wx.showToast({ title: '请先登录后再查看资产', icon: 'none' });
+      setTimeout(() => {
+        wx.navigateTo({ url: '/pages/login/login' });
+      }, 500);
+      return;
+    }
     if (options.id) {
       this.loadAsset(options.id);
     } else {
