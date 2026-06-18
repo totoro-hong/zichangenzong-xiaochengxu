@@ -96,11 +96,19 @@
             <text class="section-title">资产分布</text>
             <view class="chart-container">
               <canvas id="pieChart" type="2d" class="pie-canvas" />
+              <view class="chart-center">
+                <text wx:if="{{!selectedCategory}}" class="chart-center-title">资产分布</text>
+                <block wx:else>
+                  <text class="chart-center-name" style="color: {{selectedCategory.color}};">{{selectedCategory.name}}</text>
+                  <text class="chart-center-pct">{{selectedCategory.pct}}</text>
+                  <text class="chart-center-amount">{{selectedCategory.amount}}</text>
+                </block>
+              </view>
             </view>
             <view class="legend-list">
-              <view class="legend-item" wx:for="{{categoryData}}" wx:key="name">
-                <view class="legend-dot" style="background: {{item.color}};" />
-                <text class="legend-name">{{item.name}}</text>
+              <view class="legend-item {{selectedCategory && selectedCategory.name === item.name ? 'legend-item-active' : ''}}" wx:for="{{categoryData}}" wx:key="name" bindtap="onLegendTap" data-index="{{index}}">
+                <view class="legend-dot {{selectedCategory && selectedCategory.name === item.name ? 'legend-dot-active' : ''}}" style="background: {{item.color}};" />
+                <text class="legend-name" style="{{selectedCategory && selectedCategory.name === item.name ? 'font-weight:600;color:var(--foreground);' : ''}}">{{item.name}}</text>
                 <text class="legend-value">{{fmt.formatCurrency(item.total)}}</text>
               </view>
             </view>

@@ -1,7 +1,6 @@
 const app = getApp();
-const db = wx.cloud.database();
-const _ = db.command;
 const util = require('../../utils/util');
+const dbHelper = require('../../utils/db');
 
 Page({
   data: {
@@ -17,6 +16,8 @@ Page({
     returnPositive: true,
     // Category data for pie chart
     categoryData: [],
+    // Pie chart interaction
+    selectedCategory: null,
     // Grouped assets
     groupedAssets: [],
     // User info
@@ -52,16 +53,23 @@ Page({
 
     try {
       const openId = app.globalData.openId;
-      const { result } = await wx.cloud.callFunction({
-        name: 'getDashboardData',
-        data: { openId },
-      });
+      let dashData;
 
-      if (!result || result.code !== 0 || !result.data) {
-        throw new Error('获取数据失败');
+      // Try cloud function first, fall back to client SDK if needed
+      try {
+        const { result } = await wx.cloud.callFunction({
+          name: 'getDashboardData',
+          data: { openId },
+        });
+        if (result && result.code === 0 && result.data) {
+          dashData = result.data;
+        } else {
+          throw new Error('云函数返回异常');
+        }
+      } catch (cfErr) {
+        console.warn('云函数调用失败，使用客户端查询:', cfErr);
+        dashData = await dbHelper.getDashboardData(openId);
       }
-
-      const dashData = result.data;
 
       if (dashData.groups.length === 0) {
         this.setData({
@@ -88,6 +96,7 @@ Page({
         categoryData: dashData.categoryData,
         groupedAssets: dashData.groupedAssets,
         groupCount: dashData.groups.length,
+        selectedCategory: null,
       });
 
       // Draw pie chart after data is ready
@@ -116,7 +125,7 @@ Page({
         const height = res[0].height;
         canvas.width = width * dpr;
         canvas.height = height * dpr;
-        ctx.scale(dpr, dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         const data = this.data.categoryData;
         if (!data || data.length === 0) return;
@@ -131,12 +140,11 @@ Page({
 
         // Draw pie slices
         let startAngle = -Math.PI / 2;
-        const colors = ['#3b9e6e', '#d4a854', '#e74c4c', '#5b7fff', '#9b6bcc'];
 
         data.forEach((item, i) => {
           const sliceAngle = (item.total / total) * Math.PI * 2;
           const endAngle = startAngle + sliceAngle;
-          const color = item.color || colors[i % colors.length];
+          const color = item.color;
 
           ctx.beginPath();
           ctx.moveTo(cx, cy);
@@ -145,15 +153,16 @@ Page({
           ctx.fillStyle = color;
           ctx.fill();
 
-          // Draw inner circle (donut hole)
           startAngle = endAngle;
         });
 
-        // Draw inner white circle for donut
+        // Clear center for donut hole
+        ctx.save();
         ctx.beginPath();
         ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.0)';
+        ctx.globalCompositeOperation = 'destination-out';
         ctx.fill();
+        ctx.restore();
 
         // Draw labels
         startAngle = -Math.PI / 2;
@@ -166,7 +175,6 @@ Page({
           const lx = cx + Math.cos(midAngle) * labelRadius;
           const ly = cy + Math.sin(midAngle) * labelRadius;
 
-          // Only show label if slice is big enough
           if (parseFloat(pct) > 5) {
             ctx.font = '11px sans-serif';
             ctx.fillStyle = '#7a8f84';
@@ -178,13 +186,6 @@ Page({
           startAngle = endAngle;
         });
 
-        // Draw center text
-        ctx.font = 'bold 16px sans-serif';
-        ctx.fillStyle = '#1a241f';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('资产分布', cx, cy + 4);
-
         // Draw outer ring line
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
@@ -192,6 +193,31 @@ Page({
         ctx.lineWidth = 1;
         ctx.stroke();
       });
+  },
+
+  onLegendTap(e) {
+    const index = e.currentTarget.dataset.index;
+    const data = this.data.categoryData;
+    if (!data || index < 0 || index >= data.length) return;
+
+    const item = data[index];
+    const total = data.reduce((s, d) => s + d.total, 0);
+    if (total === 0) return;
+
+    // Toggle: if already selected, deselect
+    if (this.data.selectedCategory && this.data.selectedCategory.name === item.name) {
+      this.setData({ selectedCategory: null }, () => this.drawPieChart());
+    } else {
+      const pct = ((item.total / total) * 100).toFixed(1);
+      this.setData({
+        selectedCategory: {
+          name: item.name,
+          color: item.color,
+          amount: util.formatCurrency(item.total),
+          pct: pct + '%',
+        },
+      }, () => this.drawPieChart());
+    }
   },
 
   // Seed test data

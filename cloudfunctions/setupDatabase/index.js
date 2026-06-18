@@ -26,10 +26,11 @@ exports.main = async () => {
     if (total === 0) {
       const categories = [
         { name: '现金存款', color: '#3b9e6e', icon: 'wallet', order: 1 },
-        { name: '基金理财', color: '#d4a854', icon: 'trending-up', order: 2 },
-        { name: '股票', color: '#e74c4c', icon: 'bar-chart', order: 3 },
-        { name: '房产', color: '#5b7fff', icon: 'home', order: 4 },
-        { name: '其他投资', color: '#9b6bcc', icon: 'more-horizontal', order: 5 },
+        { name: '理财', color: '#f0a030', icon: 'trending-up', order: 2 },
+        { name: '基金', color: '#d4a854', icon: 'bar-chart', order: 3 },
+        { name: '股票', color: '#e74c4c', icon: 'bar-chart', order: 4 },
+        { name: '房产', color: '#5b7fff', icon: 'home', order: 5 },
+        { name: '其他投资', color: '#9b6bcc', icon: 'more-horizontal', order: 6 },
       ];
       for (const c of categories) {
         await db.collection('asset_categories').add({ data: c });

@@ -64,6 +64,23 @@
   margin-bottom: 20rpx;
 }
 
+.value-card-compact {
+  padding: 24rpx 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.value-row-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.value-divider {
+  width: 1px;
+  height: 56rpx;
+  background: var(--sidebar-border);
+}
+
 .value-row {
   display: flex;
   align-items: center;

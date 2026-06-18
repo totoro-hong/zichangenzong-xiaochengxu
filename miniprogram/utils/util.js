@@ -55,6 +55,43 @@ function calcReturnRate(purchaseAmount, currentValue) {
 }
 
 /**
+ * Calculate holding days from purchase date to today
+ */
+function calcHoldingDays(purchaseDate) {
+  if (!purchaseDate) return 0;
+  const purchase = new Date(purchaseDate);
+  const now = new Date();
+  const diff = now.getTime() - purchase.getTime();
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+}
+
+/**
+ * Format holding days into readable string
+ */
+function formatHoldingDays(days) {
+  if (days <= 0) return '刚购入';
+  if (days < 30) return days + '天';
+  const months = Math.floor(days / 30);
+  const remainingDays = days % 30;
+  if (months < 12) {
+    return remainingDays > 0 ? months + '个月' + remainingDays + '天' : months + '个月';
+  }
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+  return remainingMonths > 0 ? years + '年' + remainingMonths + '个月' : years + '年';
+}
+
+/**
+ * Calculate annualized return rate
+ */
+function calcAnnualizedReturn(purchaseAmount, currentValue, holdingDays) {
+  if (!purchaseAmount || Number(purchaseAmount) === 0 || holdingDays <= 0) return 0;
+  if (holdingDays < 7) return 0; // too short to annualize
+  const ratio = Number(currentValue) / Number(purchaseAmount);
+  return (Math.pow(ratio, 365 / holdingDays) - 1) * 100;
+}
+
+/**
  * Get today's date as YYYY-MM-DD
  */
 function getToday() {
@@ -70,7 +107,8 @@ function getToday() {
  */
 const CATEGORIES = [
   { id: 'cash', name: '现金存款', color: '#3b9e6e', icon: 'wallet' },
-  { id: 'fund', name: '基金理财', color: '#d4a854', icon: 'trending-up' },
+  { id: 'licai', name: '理财', color: '#f0a030', icon: 'trending-up' },
+  { id: 'fund', name: '基金', color: '#d4a854', icon: 'bar-chart' },
   { id: 'stock', name: '股票', color: '#e74c4c', icon: 'bar-chart' },
   { id: 'property', name: '房产', color: '#5b7fff', icon: 'home' },
   { id: 'other', name: '其他投资', color: '#9b6bcc', icon: 'more-horizontal' },
@@ -98,6 +136,9 @@ module.exports = {
   formatDate,
   formatDateTime,
   calcReturnRate,
+  calcHoldingDays,
+  formatHoldingDays,
+  calcAnnualizedReturn,
   getToday,
   CATEGORIES,
   CATEGORY_MAP,

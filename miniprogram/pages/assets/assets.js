@@ -1,5 +1,6 @@
 const app = getApp();
 const util = require('../../utils/util');
+const dbHelper = require('../../utils/db');
 
 Page({
   data: {
@@ -35,16 +36,24 @@ Page({
 
     try {
       const openId = app.globalData.openId;
-      const { result } = await wx.cloud.callFunction({
-        name: 'getDashboardData',
-        data: { openId },
-      });
+      let dashData;
 
-      if (!result || result.code !== 0 || !result.data) {
-        throw new Error('获取数据失败');
+      // Try cloud function first, fall back to client SDK if needed
+      try {
+        const { result } = await wx.cloud.callFunction({
+          name: 'getDashboardData',
+          data: { openId },
+        });
+        if (result && result.code === 0 && result.data) {
+          dashData = result.data;
+        } else {
+          throw new Error('云函数返回异常');
+        }
+      } catch (cfErr) {
+        console.warn('云函数调用失败，使用客户端查询:', cfErr);
+        dashData = await dbHelper.getDashboardData(openId);
       }
 
-      const dashData = result.data;
       const assets = dashData.assets || [];
       const groups = dashData.groups || [];
 

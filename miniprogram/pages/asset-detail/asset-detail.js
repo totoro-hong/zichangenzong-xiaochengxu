@@ -15,6 +15,10 @@ Page({
     formattedCurrentValue: '¥0',
     formattedCreatedAt: '',
     formattedUpdatedAt: '',
+    // Holding & annualized return
+    holdingDisplay: '',
+    annualizedReturn: '--',
+    annualizedPositive: true,
   },
 
   onLoad(options) {
@@ -42,6 +46,10 @@ Page({
       const currentValue = Number(asset.currentValue || 0);
       const returnRate = util.calcReturnRate(purchaseAmount, currentValue);
 
+      // Holding period & annualized return
+      const holdingDays = util.calcHoldingDays(asset.purchaseDate);
+      const annualizedReturn = util.calcAnnualizedReturn(purchaseAmount, currentValue, holdingDays);
+
       this.setData({
         asset,
         loading: false,
@@ -51,6 +59,9 @@ Page({
         formattedCurrentValue: util.formatCurrency(currentValue),
         formattedCreatedAt: util.formatDateTime(asset.createdAt),
         formattedUpdatedAt: util.formatDateTime(asset.updatedAt),
+        holdingDisplay: util.formatHoldingDays(holdingDays),
+        annualizedReturn: annualizedReturn !== 0 ? (annualizedReturn >= 0 ? '+' : '') + annualizedReturn.toFixed(2) + '%' : '--',
+        annualizedPositive: annualizedReturn >= 0,
       });
     } catch (err) {
       console.error('Load asset error:', err);

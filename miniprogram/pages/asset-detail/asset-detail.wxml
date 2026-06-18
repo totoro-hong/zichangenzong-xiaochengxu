@@ -46,6 +46,22 @@
       </view>
     </view>
 
+    <!-- Holding & annualized return card -->
+    <view class="value-card-compact glass">
+      <view class="value-row-compact">
+        <view class="value-field" style="align-items: center;">
+          <text class="value-label">持有时间</text>
+          <text class="value-amount" style="font-size: 32rpx;">{{holdingDisplay}}</text>
+        </view>
+        <view class="value-divider"></view>
+        <view class="value-field" style="align-items: center;">
+          <text class="value-label">年化收益率</text>
+          <text class="value-amount {{annualizedPositive ? 'value-amount-primary' : 'text-emerald'}}" style="font-size: 32rpx;" wx:if="{{annualizedReturn !== '--'}}">{{annualizedReturn}}</text>
+          <text class="value-amount" style="font-size: 28rpx; color: var(--muted);" wx:else>{{annualizedReturn}}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- Details card -->
     <view class="details-card glass">
       <view class="detail-row">
