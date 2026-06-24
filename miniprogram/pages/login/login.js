@@ -57,12 +57,30 @@ Page({
       }
 
       const openId = result.openid;
-      const userInfo = { nickName: '用户', avatarUrl: '' };
+
+      // 尝试获取用户微信昵称（需要用户点击授权）
+      let nickName = '用户';
+      let avatarUrl = '';
+      try {
+        const profile = await wx.getUserProfile({ desc: '用于在群组中显示你的昵称' });
+        if (profile && profile.userInfo) {
+          nickName = profile.userInfo.nickName || '用户';
+          avatarUrl = profile.userInfo.avatarUrl || '';
+        }
+      } catch (e) {
+        // 用户拒绝授权或 getUserProfile 不可用，使用默认昵称
+        console.warn('获取用户信息失败，使用默认昵称:', e);
+      }
+
+      const userInfo = { nickName, avatarUrl };
       app.setUserInfo(userInfo, openId);
 
       // Init user group via cloud function (ensures userId is set properly)
       try {
-        await wx.cloud.callFunction({ name: 'initUserGroup' });
+        await wx.cloud.callFunction({
+          name: 'initUserGroup',
+          data: { nickName },
+        });
       } catch (e) {
         console.error('Init user group error:', e);
       }

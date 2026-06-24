@@ -1,4 +1,5 @@
 const app = getApp();
+const dbHelper = require('../../utils/db');
 
 Page({
   data: {
@@ -30,25 +31,14 @@ Page({
     this.setData({ searching: true, error: '', group: null, joined: false });
 
     try {
-      const db = wx.cloud.database();
-      const groupRes = await db.collection('groups').doc(id).get();
-
-      if (!groupRes.data) {
-        this.setData({ error: '未找到该群组', searching: false });
-        return;
-      }
-
-      const membersRes = await db.collection('group_members')
-        .where({ groupId: id })
-        .get();
-
+      const detail = await dbHelper.getGroupDetail(id);
       const openId = app.globalData.openId;
-      const alreadyJoined = membersRes.data.some(m => m.userId === openId);
+      const alreadyJoined = detail.members.some(m => m.userId === openId);
 
       this.setData({
         searching: false,
-        group: groupRes.data,
-        members: membersRes.data,
+        group: detail.group,
+        members: detail.members,
         alreadyJoined,
       });
     } catch (err) {
@@ -62,31 +52,26 @@ Page({
     this.setData({ joining: true, error: '' });
 
     try {
-      const db = wx.cloud.database();
       const nickName = app.globalData.userInfo?.nickName || '用户';
       const openId = app.globalData.openId;
 
-      await db.collection('group_members').add({
-        data: {
-          groupId: this.data.group._id,
-          userId: openId,
-          nickName: nickName,
-          role: 'member',
-          createdAt: db.serverDate(),
-        },
-      });
+      const result = await dbHelper.joinGroup(
+        this.data.group._id,
+        openId,
+        nickName
+      );
 
-      this.setData({ joining: false, joined: true, alreadyJoined: true });
-      wx.showToast({ title: '已加入群组', icon: 'success' });
+      if (result) {
+        this.setData({ joining: false, joined: true, alreadyJoined: true });
+        wx.showToast({ title: '已加入群组', icon: 'success' });
+      } else {
+        this.setData({ joining: false, alreadyJoined: true });
+        wx.showToast({ title: '你已在群组中', icon: 'none' });
+      }
     } catch (err) {
       console.error('Join group error:', err);
-      if (err.errCode === -502005) {
-        wx.showToast({ title: '你已在群组中', icon: 'none' });
-        this.setData({ joining: false, alreadyJoined: true });
-      } else {
-        this.setData({ joining: false });
-        wx.showToast({ title: '加入失败', icon: 'none' });
-      }
+      this.setData({ joining: false });
+      wx.showToast({ title: '加入失败', icon: 'none' });
     }
   },
 

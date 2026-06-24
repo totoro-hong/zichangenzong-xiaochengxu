@@ -81,29 +81,13 @@ async function getOrCreateDefaultGroup(openId, nickName) {
  * Fetch user's groups with member info
  */
 async function getUserGroups(openId) {
-  const memberRes = await db.collection('group_members')
-    .where({ userId: openId })
-    .get();
-
-  const groupIds = memberRes.data.map(m => m.groupId);
-  if (groupIds.length === 0) return [];
-
-  const groupsRes = await db.collection('groups')
-    .where({ _id: _.in(groupIds) })
-    .get();
-
-  // Build member count map
-  const groups = groupsRes.data.map(g => {
-    const members = memberRes.data.filter(m => m.groupId === g._id);
-    const myMembership = members.find(m => m.userId === openId);
-    return {
-      ...g,
-      memberCount: members.length,
-      myRole: myMembership ? myMembership.role : 'member',
-    };
+  const { result } = await wx.cloud.callFunction({
+    name: 'getUserGroups',
+    data: { openId },
   });
 
-  return groups;
+  if (result.code !== 0) return [];
+  return result.data || [];
 }
 
 /**
@@ -233,73 +217,58 @@ async function deleteAsset(id) {
  * Create a new group
  */
 async function createGroup(name, openId, nickName) {
-  const groupRes = await db.collection('groups').add({
-    data: {
-      name,
-      createdBy: openId,
-      createdAt: db.serverDate(),
-    }
+  const { result } = await wx.cloud.callFunction({
+    name: 'createGroup',
+    data: { name, openId, nickName },
   });
 
-  await db.collection('group_members').add({
-    data: {
-      groupId: groupRes._id,
-      userId: openId,
-      nickName: nickName || '',
-      role: 'owner',
-      createdAt: db.serverDate(),
-    }
-  });
+  if (result.code !== 0) {
+    throw new Error(result.message || '创建失败');
+  }
 
-  return groupRes._id;
+  return result.data._id;
 }
 
 /**
  * Get group details with members
  */
 async function getGroupDetail(groupId) {
-  const groupRes = await db.collection('groups').doc(groupId).get();
-  const membersRes = await db.collection('group_members')
-    .where({ groupId })
-    .get();
+  const { result } = await wx.cloud.callFunction({
+    name: 'getGroupDetail',
+    data: { groupId },
+  });
 
-  // Get total assets for the group
-  const assetsRes = await db.collection('assets')
-    .where({ groupId })
-    .get();
+  if (result.code !== 0 || !result.data) {
+    throw new Error('获取群组详情失败');
+  }
 
-  const totalValue = assetsRes.data.reduce((s, a) => s + Number(a.currentValue || 0), 0);
-  const totalCost = assetsRes.data.reduce((s, a) => s + Number(a.purchaseAmount || 0), 0);
-
-  return {
-    group: groupRes.data,
-    members: membersRes.data,
-    totalAssets: totalValue,
-    totalCost,
-    assetCount: assetsRes.data.length,
-  };
+  return result.data;
 }
 
 /**
  * Join a group (for invite functionality)
  */
 async function joinGroup(groupId, openId, nickName) {
-  // Check if already a member
-  const existing = await db.collection('group_members')
-    .where({ groupId, userId: openId })
-    .get();
-
-  if (existing.data.length > 0) return false;
-
-  await db.collection('group_members').add({
-    data: {
-      groupId,
-      userId: openId,
-      nickName: nickName || '',
-      role: 'member',
-      createdAt: db.serverDate(),
-    }
+  const { result } = await wx.cloud.callFunction({
+    name: 'joinGroup',
+    data: { groupId, openId, nickName },
   });
+
+  return result.code === 0;
+}
+
+/**
+ * Delete a group and all its data
+ */
+async function deleteGroup(groupId) {
+  const { result } = await wx.cloud.callFunction({
+    name: 'deleteGroup',
+    data: { groupId },
+  });
+
+  if (result.code !== 0) {
+    throw new Error(result.message || '删除失败');
+  }
 
   return true;
 }
@@ -318,4 +287,5 @@ module.exports = {
   createGroup,
   getGroupDetail,
   joinGroup,
+  deleteGroup,
 };

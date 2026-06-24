@@ -82,5 +82,14 @@
         </button>
       </view>
     </view>
+
+    <!-- Delete group (only for owner) -->
+    <view wx:if="{{isOwner}}" class="delete-card glass">
+      <text class="section-title" style="color: #e74c4c;">危险操作</text>
+      <text class="invite-desc">删除群组将同时清除所有资产数据，不可恢复</text>
+      <button class="btn btn-danger btn-small" bindtap="handleDeleteGroup" style="width: 80%; margin-top: 20rpx;">
+        删除群组
+      </button>
+    </view>
   </scroll-view>
 </view>

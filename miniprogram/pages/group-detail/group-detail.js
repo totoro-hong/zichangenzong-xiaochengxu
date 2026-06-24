@@ -1,5 +1,4 @@
 const app = getApp();
-const db = wx.cloud.database();
 const util = require('../../utils/util');
 const dbHelper = require('../../utils/db');
 
@@ -111,5 +110,35 @@ Page({
         wx.showToast({ title: '已复制', icon: 'success' });
       },
     });
+  },
+
+  async handleDeleteGroup() {
+    const group = this.data.group;
+    if (!group) return;
+
+    const res = await wx.showModal({
+      title: '删除群组',
+      content: `确定要删除群组「${group.name}」吗？\n群组内所有资产数据也将被删除，此操作不可恢复。`,
+      confirmText: '删除',
+      confirmColor: '#e74c4c',
+      cancelText: '取消',
+    });
+
+    if (!res.confirm) return;
+
+    wx.showLoading({ title: '删除中...' });
+
+    try {
+      await dbHelper.deleteGroup(group._id);
+      wx.hideLoading();
+      wx.showToast({ title: '群组已删除', icon: 'success' });
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1000);
+    } catch (err) {
+      console.error('Delete group error:', err);
+      wx.hideLoading();
+      wx.showToast({ title: err.message || '删除失败', icon: 'none' });
+    }
   },
 });

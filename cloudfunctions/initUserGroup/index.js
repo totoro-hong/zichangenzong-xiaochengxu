@@ -5,6 +5,7 @@ const db = cloud.database();
 exports.main = async (event) => {
   const wxContext = cloud.getWXContext();
   const openId = wxContext.OPENID;
+  const nickName = event.nickName || '用户';
 
   // Check if user already has a group
   const memberRes = await db.collection('group_members')
@@ -18,7 +19,7 @@ exports.main = async (event) => {
   // Create default group
   const groupRes = await db.collection('groups').add({
     data: {
-      name: '我的资产',
+      name: nickName ? `${nickName}的资产` : '我的资产',
       createdBy: openId,
       createdAt: db.serverDate()
     }
@@ -28,7 +29,7 @@ exports.main = async (event) => {
     data: {
       groupId: groupRes._id,
       userId: openId,
-      nickName: '用户',
+      nickName,
       role: 'owner',
       createdAt: db.serverDate()
     }
