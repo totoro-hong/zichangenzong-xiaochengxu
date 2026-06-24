@@ -30,13 +30,33 @@
       <view class="dash-header animate-in">
         <view class="header-left">
           <text class="header-title text-gradient">资产总览</text>
-          <text class="header-desc">查看你所有资产的综合情况</text>
+          <text class="header-desc">{{selectedGroupId ? selectedGroupName : '查看你所有资产的综合情况'}}</text>
         </view>
         <view wx:if="{{!isGuest}}" class="header-right">
           <view class="avatar-ring" bindtap="goToGroups">
             <text class="avatar-text">{{fmt.getFirstChar(nickName)}}</text>
           </view>
         </view>
+      </view>
+
+      <!-- Group filter tabs -->
+      <view wx:if="{{groupList.length > 0}}" class="group-filter animate-in animate-in-d1">
+        <scroll-view class="group-filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+          <view class="group-filter-inner">
+            <view class="group-chip {{selectedGroupId === '' ? 'group-chip-active' : ''}}" bindtap="selectGroup" data-id="">
+              <text>全部</text>
+            </view>
+            <view
+              wx:for="{{groupList}}"
+              wx:key="_id"
+              class="group-chip {{selectedGroupId === item._id ? 'group-chip-active' : ''}}"
+              bindtap="selectGroup"
+              data-id="{{item._id}}"
+            >
+              <text>{{item.name}}</text>
+            </view>
+          </view>
+        </scroll-view>
       </view>
 
       <!-- Stats cards -->

@@ -25,6 +25,10 @@ Page({
     avatarUrl: '',
     // Groups count
     groupCount: 0,
+    // Group filter
+    groupList: [],
+    selectedGroupId: '',
+    selectedGroupName: '全部群组',
   },
 
   async onShow() {
@@ -48,18 +52,17 @@ Page({
     wx.reLaunch({ url: '/pages/login/login' });
   },
 
-  async loadDashboard() {
+  async loadDashboard(groupId) {
     this.setData({ loading: true });
 
     try {
       const openId = app.globalData.openId;
       let dashData;
 
-      // Try cloud function first, fall back to client SDK if needed
       try {
         const { result } = await wx.cloud.callFunction({
           name: 'getDashboardData',
-          data: { openId },
+          data: { openId, groupId: groupId || '' },
         });
         if (result && result.code === 0 && result.data) {
           dashData = result.data;
@@ -68,7 +71,7 @@ Page({
         }
       } catch (cfErr) {
         console.warn('云函数调用失败，使用客户端查询:', cfErr);
-        dashData = await dbHelper.getDashboardData(openId);
+        dashData = await dbHelper.getDashboardData(openId, groupId);
       }
 
       if (dashData.groups.length === 0) {
@@ -78,9 +81,19 @@ Page({
           hasAssets: false,
           groupedAssets: [],
           categoryData: [],
+          groupList: [],
+          selectedGroupId: '',
         });
         return;
       }
+
+      // Build group list for filter tabs
+      const groupList = (dashData.groupSummaries || []).map(g => ({
+        _id: g._id,
+        name: g.name,
+        totalValue: g.totalValue,
+        assetCount: g.assetCount,
+      }));
 
       const fmt = util.formatCurrency;
       const returnPositive = dashData.totalReturn >= 0;
@@ -96,6 +109,9 @@ Page({
         categoryData: dashData.categoryData,
         groupedAssets: dashData.groupedAssets,
         groupCount: dashData.groups.length,
+        groupList,
+        selectedGroupId: groupId || '',
+        selectedGroupName: groupId ? (dashData.selectedGroup?.name || '') : '全部群组',
         selectedCategory: null,
       });
 
@@ -108,6 +124,12 @@ Page({
       this.setData({ loading: false });
       wx.showToast({ title: '加载失败', icon: 'none' });
     }
+  },
+
+  selectGroup(e) {
+    const id = e.currentTarget.dataset.id || '';
+    this.setData({ selectedGroupId: id });
+    this.loadDashboard(id);
   },
 
   drawPieChart() {

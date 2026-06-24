@@ -107,13 +107,13 @@ async function getGroupAssets(groupIds) {
 /**
  * Fetch all data needed for dashboard
  */
-async function getDashboardData(openId) {
+async function getDashboardData(openId, groupId) {
   const groups = await getUserGroups(openId);
   if (groups.length === 0) {
-    return { groups: [], assets: [], totalValue: 0, totalCost: 0, totalReturn: 0, returnRate: 0, categoryData: [] };
+    return { groups: [], assets: [], totalValue: 0, totalCost: 0, totalReturn: 0, returnRate: 0, categoryData: [], groupSummaries: [], selectedGroup: null };
   }
 
-  const groupIds = groups.map(g => g._id);
+  const groupIds = groupId ? [groupId] : groups.map(g => g._id);
   const assets = await getGroupAssets(groupIds);
 
   return computeDashboardStats(assets, groups, openId);
