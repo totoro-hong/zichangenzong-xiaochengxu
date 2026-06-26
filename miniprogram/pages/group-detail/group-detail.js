@@ -87,6 +87,7 @@ Page({
 
       if (result) {
         this.setData({ joinSuccess: true, isMember: true, joining: false });
+        app.invalidateCache();
         wx.showToast({ title: '已加入群组', icon: 'success' });
         await this.loadGroupDetail(this.data.group._id);
       } else {
@@ -130,6 +131,7 @@ Page({
 
     try {
       await dbHelper.deleteGroup(group._id);
+      app.invalidateCache();
       wx.hideLoading();
       wx.showToast({ title: '群组已删除', icon: 'success' });
       setTimeout(() => {

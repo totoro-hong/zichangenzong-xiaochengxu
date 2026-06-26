@@ -86,6 +86,7 @@ Page({
           that.setData({ deleting: true });
           try {
             await dbHelper.deleteAsset(that.data.asset._id);
+            app.invalidateCache();
             wx.showToast({ title: '删除成功', icon: 'success' });
             setTimeout(() => {
               wx.navigateBack();

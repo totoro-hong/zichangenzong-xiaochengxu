@@ -40,6 +40,7 @@ Page({
       const nickName = app.globalData.userInfo?.nickName || '用户';
       await dbHelper.createGroup(name, openId, nickName);
 
+      app.invalidateCache();
       wx.showToast({ title: '创建成功', icon: 'success' });
       setTimeout(() => {
         wx.navigateBack();

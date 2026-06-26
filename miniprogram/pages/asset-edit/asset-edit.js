@@ -174,6 +174,7 @@ Page({
         note: this.data.note,
       });
 
+      app.invalidateCache();
       wx.showToast({ title: '保存成功', icon: 'success' });
       setTimeout(() => {
         wx.navigateBack();
@@ -193,6 +194,7 @@ Page({
         if (res.confirm) {
           try {
             await dbHelper.deleteAsset(that.data.id);
+            app.invalidateCache();
             wx.showToast({ title: '删除成功', icon: 'success' });
             setTimeout(() => {
               wx.navigateBack({ delta: 2 });

@@ -63,6 +63,7 @@ Page({
 
       if (result) {
         this.setData({ joining: false, joined: true, alreadyJoined: true });
+        app.invalidateCache();
         wx.showToast({ title: '已加入群组', icon: 'success' });
       } else {
         this.setData({ joining: false, alreadyJoined: true });

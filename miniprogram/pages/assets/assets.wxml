@@ -33,6 +33,24 @@
     </view>
   </view>
 
+  <!-- Group filter tabs -->
+  <scroll-view wx:if="{{groupList.length > 0}}" class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="category-pills">
+      <view class="pill {{selectedGroupId === '' ? 'pill-active' : ''}}" bindtap="filterByGroup" data-id="">
+        <text>全部群组</text>
+      </view>
+      <view
+        wx:for="{{groupList}}"
+        wx:key="_id"
+        class="pill {{selectedGroupId === item._id ? 'pill-active' : ''}}"
+        bindtap="filterByGroup"
+        data-id="{{item._id}}"
+      >
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
   <!-- Category filter pills -->
   <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
     <view class="category-pills">

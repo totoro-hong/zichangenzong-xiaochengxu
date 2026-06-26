@@ -31,8 +31,7 @@ Page({
     selectedGroupName: '全部群组',
   },
 
-  async onShow() {
-    // Not logged in — auto treat as guest so user can browse first
+  onShow() {
     if (!app.globalData.hasLogin) {
       app.setGuestMode();
       this.setData({ isGuest: true, loading: false });
@@ -45,7 +44,17 @@ Page({
       avatarUrl: app.globalData.userInfo?.avatarUrl || '',
     });
 
-    await this.loadDashboard();
+    // 有缓存 → 秒开
+    const cached = app.getCache();
+    if (cached) {
+      console.log('[DASHBOARD] 使用缓存渲染');
+      this.renderDashboard(cached);
+    } else {
+      console.log('[DASHBOARD] 无缓存，显示加载');
+      this.setData({ loading: true });
+    }
+
+    this.loadDashboard().catch(e => console.error(e));
   },
 
   goToLogin() {
@@ -53,16 +62,19 @@ Page({
   },
 
   async loadDashboard(groupId) {
-    this.setData({ loading: true });
+    if (groupId !== undefined) {
+      this.setData({ selectedGroupId: groupId, loading: true });
+    }
 
     try {
       const openId = app.globalData.openId;
+      const currentGroupId = groupId !== undefined ? groupId : this.data.selectedGroupId;
       let dashData;
 
       try {
         const { result } = await wx.cloud.callFunction({
           name: 'getDashboardData',
-          data: { openId, groupId: groupId || '' },
+          data: { openId, groupId: currentGroupId || '' },
         });
         if (result && result.code === 0 && result.data) {
           dashData = result.data;
@@ -71,7 +83,7 @@ Page({
         }
       } catch (cfErr) {
         console.warn('云函数调用失败，使用客户端查询:', cfErr);
-        dashData = await dbHelper.getDashboardData(openId, groupId);
+        dashData = await dbHelper.getDashboardData(openId, currentGroupId);
       }
 
       if (dashData.groups.length === 0) {
@@ -82,43 +94,17 @@ Page({
           groupedAssets: [],
           categoryData: [],
           groupList: [],
-          selectedGroupId: '',
+          selectedGroupId: currentGroupId || '',
         });
         return;
       }
 
-      // Build group list for filter tabs
-      const groupList = (dashData.groupSummaries || []).map(g => ({
-        _id: g._id,
-        name: g.name,
-        totalValue: g.totalValue,
-        assetCount: g.assetCount,
-      }));
-
-      const fmt = util.formatCurrency;
-      const returnPositive = dashData.totalReturn >= 0;
-
-      this.setData({
-        loading: false,
-        hasGroups: true,
-        hasAssets: dashData.assets.length > 0,
-        totalValue: fmt(dashData.totalValue),
-        totalReturn: fmt(dashData.totalReturn),
-        returnRate: (returnPositive ? '+' : '') + dashData.returnRate.toFixed(1) + '%',
-        returnPositive,
-        categoryData: dashData.categoryData,
-        groupedAssets: dashData.groupedAssets,
-        groupCount: dashData.groups.length,
-        groupList,
-        selectedGroupId: groupId || '',
-        selectedGroupName: groupId ? (dashData.selectedGroup?.name || '') : '全部群组',
-        selectedCategory: null,
-      });
-
-      // Draw pie chart after data is ready
-      if (dashData.categoryData.length > 0) {
-        setTimeout(() => this.drawPieChart(), 200);
+      // 缓存全量数据（无筛选时才缓存）
+      if (!currentGroupId) {
+        app.setCache(dashData);
       }
+
+      this.renderDashboard(dashData);
     } catch (err) {
       console.error('Dashboard load error:', err);
       this.setData({ loading: false });
@@ -126,9 +112,37 @@ Page({
     }
   },
 
+  renderDashboard(dashData) {
+    console.log('[DASHBOARD] 渲染数据, groupCount:', dashData.groups?.length, 'assets:', dashData.assets?.length);
+    const groupList = (dashData.groupSummaries || []).map(g => ({
+      _id: g._id, name: g.name, totalValue: g.totalValue, assetCount: g.assetCount,
+    }));
+    const fmt = util.formatCurrency;
+    const returnPositive = dashData.totalReturn >= 0;
+
+    this.setData({
+      loading: false,
+      hasGroups: true,
+      hasAssets: dashData.assets.length > 0,
+      totalValue: fmt(dashData.totalValue),
+      totalReturn: fmt(dashData.totalReturn),
+      returnRate: (returnPositive ? '+' : '') + dashData.returnRate.toFixed(1) + '%',
+      returnPositive,
+      categoryData: dashData.categoryData,
+      groupedAssets: dashData.groupedAssets,
+      groupCount: dashData.groups.length,
+      groupList,
+      selectedGroupName: dashData.selectedGroup?.name || '全部群组',
+      selectedCategory: null,
+    });
+
+    if (dashData.categoryData.length > 0) {
+      setTimeout(() => this.drawPieChart(), 200);
+    }
+  },
+
   selectGroup(e) {
     const id = e.currentTarget.dataset.id || '';
-    this.setData({ selectedGroupId: id });
     this.loadDashboard(id);
   },
 
@@ -190,6 +204,7 @@ Page({
         startAngle = -Math.PI / 2;
         data.forEach((item, i) => {
           const sliceAngle = (item.total / total) * Math.PI * 2;
+          const endAngle = startAngle + sliceAngle;
           const midAngle = startAngle + sliceAngle / 2;
           const pct = ((item.total / total) * 100).toFixed(1);
 

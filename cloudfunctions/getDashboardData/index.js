@@ -6,9 +6,9 @@ const _ = db.command;
 exports.main = async (event) => {
   const wxContext = cloud.getWXContext();
   const openId = event.openId || wxContext.OPENID;
-  const filterGroupId = event.groupId || ''; // 可选，筛选某个群组
+  const filterGroupId = event.groupId || '';
 
-  // Get all groups the user belongs to
+  // 1. Get all groups the user belongs to
   const memberRes = await db.collection('group_members')
     .where({ userId: openId })
     .get();
@@ -28,35 +28,12 @@ exports.main = async (event) => {
     myRole: memberRes.data.find(m => m.groupId === g._id)?.role || 'member',
   }));
 
-  // Build per-group summaries
-  const groupSummaries = [];
-  for (var i = 0; i < groups.length; i++) {
-    var g = groups[i];
-    var gAssets = await db.collection('assets')
-      .where({ groupId: g._id })
-      .get();
-    var gValue = gAssets.data.reduce(function(s, a) { return s + Number(a.currentValue || 0); }, 0);
-    var gCost = gAssets.data.reduce(function(s, a) { return s + Number(a.purchaseAmount || 0); }, 0);
-    groupSummaries.push({
-      _id: g._id,
-      name: g.name,
-      memberCount: g.memberCount,
-      myRole: g.myRole,
-      totalValue: gValue,
-      totalCost: gCost,
-      assetCount: gAssets.data.length,
-    });
-  }
+  // 2. Determine which groups to query assets for
+  const queryGroupIds = filterGroupId && groupIds.includes(filterGroupId)
+    ? [filterGroupId]
+    : groupIds;
 
-  // Determine which groups to query assets for
-  var queryGroupIds = groupIds;
-  var selectedGroup = null;
-  if (filterGroupId && groupIds.indexOf(filterGroupId) !== -1) {
-    queryGroupIds = [filterGroupId];
-    selectedGroup = groupSummaries.find(function(s) { return s._id === filterGroupId; }) || null;
-  }
-
-  // Get assets for the selected groups
+  // 3. Single assets query (was: per-group loop + redundant 2nd query)
   const assetRes = await db.collection('assets')
     .where({ groupId: _.in(queryGroupIds) })
     .orderBy('createdAt', 'desc')
@@ -64,35 +41,55 @@ exports.main = async (event) => {
 
   const assets = assetRes.data;
 
-  // Compute stats
-  const totalValue = assets.reduce(function(s, a) { return s + Number(a.currentValue || 0); }, 0);
-  const totalCost = assets.reduce(function(s, a) { return s + Number(a.purchaseAmount || 0); }, 0);
+  // 4. Build per-group summaries from the single asset result (was: N separate queries)
+  const groupSummaries = groups.map(g => {
+    const gAssets = assets.filter(a => a.groupId === g._id);
+    const gValue = gAssets.reduce((s, a) => s + Number(a.currentValue || 0), 0);
+    const gCost = gAssets.reduce((s, a) => s + Number(a.purchaseAmount || 0), 0);
+    return {
+      _id: g._id,
+      name: g.name,
+      memberCount: g.memberCount,
+      myRole: g.myRole,
+      totalValue: gValue,
+      totalCost: gCost,
+      assetCount: gAssets.length,
+    };
+  });
+
+  const selectedGroup = filterGroupId
+    ? groupSummaries.find(s => s._id === filterGroupId) || null
+    : null;
+
+  // 5. Compute stats
+  const totalValue = assets.reduce((s, a) => s + Number(a.currentValue || 0), 0);
+  const totalCost = assets.reduce((s, a) => s + Number(a.purchaseAmount || 0), 0);
   const totalReturn = totalValue - totalCost;
   const returnRate = totalCost > 0 ? (totalReturn / totalCost) * 100 : 0;
 
-  // Category aggregation
+  // 6. Category aggregation
   const catMap = {};
-  for (var i = 0; i < assets.length; i++) {
-    var a = assets[i];
-    var catName = a.categoryName || '未分类';
-    var catColor = a.categoryColor || '#999';
+  for (const a of assets) {
+    const catName = a.categoryName || '未分类';
+    const catColor = a.categoryColor || '#999';
     if (!catMap[catName]) catMap[catName] = { name: catName, color: catColor, total: 0, count: 0 };
     catMap[catName].total += Number(a.currentValue || 0);
     catMap[catName].count += 1;
   }
-  var categoryData = Object.values(catMap).sort(function(a, b) { return b.total - a.total; });
+  const categoryData = Object.values(catMap).sort((a, b) => b.total - a.total);
 
-  // Group assets by category
-  var groupedMap = {};
-  for (var i = 0; i < assets.length; i++) {
-    var a = assets[i];
-    var catName = a.categoryName || '未分类';
+  // 7. Group assets by category
+  const groupedMap = {};
+  for (const a of assets) {
+    const catName = a.categoryName || '未分类';
     if (!groupedMap[catName]) groupedMap[catName] = [];
     groupedMap[catName].push(a);
   }
-  var groupedAssets = Object.keys(groupedMap).map(function(name) {
-    return { name: name, color: groupedMap[name][0]?.categoryColor || '#999', assets: groupedMap[name] };
-  });
+  const groupedAssets = Object.keys(groupedMap).map(name => ({
+    name,
+    color: groupedMap[name][0]?.categoryColor || '#999',
+    assets: groupedMap[name],
+  }));
 
   return {
     code: 0,

@@ -134,6 +134,7 @@ Page({
         note: this.data.note,
       });
 
+      app.invalidateCache();
       wx.showToast({ title: '添加成功', icon: 'success' });
       setTimeout(() => {
         wx.navigateBack();
