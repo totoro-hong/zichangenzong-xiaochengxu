@@ -16,6 +16,11 @@ Page({
     groupList: [],
     selectedGroupId: '',
     selectedGroupName: '全部群组',
+    // Historical (settled) assets
+    tab: 'active',
+    settledAssets: [],
+    settledLoading: false,
+    hasSettled: false,
   },
 
   onShow() {
@@ -34,6 +39,7 @@ Page({
       console.log('[ASSETS] 使用缓存渲染');
       this.renderAssets(cached);
       this.setData({ loading: false });
+      this.filterAssets();
     } else {
       console.log('[ASSETS] 无缓存，显示加载');
       this.setData({ loading: true });
@@ -79,6 +85,7 @@ Page({
 
       app.setCache(dashData);
       this.renderAssets(dashData);
+      this.filterAssets();
     } catch (err) {
       console.error('Load assets error:', err);
       this.setData({ loading: false });
@@ -170,5 +177,44 @@ Page({
     }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/asset-detail/asset-detail?id=${id}` });
+  },
+
+  // ── Tab switching (active / settled) ──
+  switchTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    if (tab === this.data.tab) return;
+    this.setData({ tab, filteredAssets: [], settledAssets: [] });
+    if (tab === 'settled') {
+      this.loadSettledAssets();
+    }
+  },
+
+  async loadSettledAssets() {
+    const groupList = this.data.groupList;
+    if (groupList.length === 0) {
+      try {
+        const openId = app.globalData.openId;
+        const groups = await dbHelper.getUserGroups(openId);
+        if (groups.length === 0) {
+          this.setData({ settledLoading: false, hasSettled: false });
+          return;
+        }
+        const groupIds = groups.map(g => g._id);
+        const settled = await dbHelper.getSettledAssets(groupIds);
+        this.setData({ settledAssets: settled, settledLoading: false, hasSettled: settled.length > 0 });
+      } catch (err) {
+        console.error('Load settled assets error:', err);
+        this.setData({ settledLoading: false });
+      }
+    } else {
+      const groupIds = groupList.map(g => g._id);
+      try {
+        const settled = await dbHelper.getSettledAssets(groupIds);
+        this.setData({ settledAssets: settled, settledLoading: false, hasSettled: settled.length > 0 });
+      } catch (err) {
+        console.error('Load settled assets error:', err);
+        this.setData({ settledLoading: false });
+      }
+    }
   },
 });

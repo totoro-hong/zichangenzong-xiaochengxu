@@ -1,4 +1,19 @@
 /**
+ * Format a number as full CNY amount (元), no 万/亿 abbreviation
+ */
+function formatYuan(amount) {
+  if (amount === undefined || amount === null) return '¥0';
+  const num = Number(amount);
+  if (isNaN(num)) return '¥0';
+  const abs = Math.abs(num);
+  const prefix = num < 0 ? '-¥' : '¥';
+  return prefix + abs.toLocaleString('zh-CN', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
+/**
  * Format a number as CNY currency string
  */
 function formatCurrency(amount) {
@@ -133,6 +148,7 @@ function getRoleLabel(role) {
 
 module.exports = {
   formatCurrency,
+  formatYuan,
   formatDate,
   formatDateTime,
   calcReturnRate,

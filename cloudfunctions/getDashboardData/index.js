@@ -39,7 +39,7 @@ exports.main = async (event) => {
     .orderBy('createdAt', 'desc')
     .get();
 
-  const assets = assetRes.data;
+  const assets = assetRes.data.filter(a => a.status !== 'settled');
 
   // 4. Build per-group summaries from the single asset result (was: N separate queries)
   const groupSummaries = groups.map(g => {

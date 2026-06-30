@@ -22,6 +22,7 @@
       <view class="hero-category-row">
         <view class="hero-cat-dot" style="background: {{asset.categoryColor || '#999'}};"></view>
         <text class="hero-category">{{asset.categoryName || '未分类'}}</text>
+        <view wx:if="{{isSettled}}" class="tag tag-gold" style="margin-left: 12rpx;">已结清</view>
       </view>
     </view>
 
@@ -36,7 +37,7 @@
           <text class="arrow-icon">{{returnPositive ? '↑' : '↓'}}</text>
         </view>
         <view class="value-field" style="align-items: flex-end;">
-          <text class="value-label">当前价值</text>
+          <text class="value-label">{{isSettled ? '结清价值' : '当前价值'}}</text>
           <text class="value-amount value-amount-primary">{{formattedCurrentValue}}</text>
         </view>
       </view>
@@ -90,6 +91,7 @@
     <!-- Actions -->
     <view class="detail-actions">
       <button class="btn btn-primary" bindtap="goEdit">编辑资产</button>
+      <button wx:if="{{!isSettled}}" class="btn btn-settle" bindtap="settleAsset">结清资产</button>
       <button class="btn btn-danger" bindtap="deleteAsset" disabled="{{deleting}}">
         <view wx:if="{{deleting}}" class="loading-spinner" style="width: 28rpx; height: 28rpx; border-width: 3rpx; border-top-color: var(--destructive);"></view>
         <text wx:else>删除资产</text>

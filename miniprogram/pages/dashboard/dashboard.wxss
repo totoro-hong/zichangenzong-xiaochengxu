@@ -326,6 +326,10 @@
   font-weight: 600;
 }
 
+.cat-return-amount {
+  font-weight: 600;
+}
+
 /* ── Asset items ── */
 .cat-assets {
   overflow: hidden;
@@ -407,6 +411,13 @@
   font-weight: 500;
   display: block;
   margin-top: 4rpx;
+}
+
+.asset-return-amount {
+  font-size: 20rpx;
+  font-weight: 600;
+  display: block;
+  margin-top: 2rpx;
 }
 
 /* ── View all ── */

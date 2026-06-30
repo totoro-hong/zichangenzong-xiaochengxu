@@ -215,3 +215,10 @@
   flex-direction: column;
   gap: 20rpx;
 }
+
+.btn-settle {
+  background: var(--accent-gold-light);
+  color: var(--accent-gold);
+  border: 1px solid rgba(212, 168, 84, 0.3);
+}
+.btn-settle:active { opacity: 0.8; }

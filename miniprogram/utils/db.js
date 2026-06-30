@@ -101,7 +101,7 @@ async function getGroupAssets(groupIds) {
     .orderBy('createdAt', 'desc')
     .get();
 
-  return data;
+  return data.filter(a => a.status !== 'settled');
 }
 
 /**
@@ -180,10 +180,35 @@ async function createAsset(data) {
       currentValue: Number(data.currentValue),
       purchaseDate: data.purchaseDate,
       note: data.note || '',
+      status: 'active',
       createdAt: db.serverDate(),
       updatedAt: db.serverDate(),
     }
   });
+}
+
+/**
+ * Settle an asset (mark as 结清)
+ */
+async function settleAsset(id) {
+  return await db.collection('assets').doc(id).update({
+    data: {
+      status: 'settled',
+      updatedAt: db.serverDate(),
+    }
+  });
+}
+
+/**
+ * Fetch settled (historical) assets for given group IDs
+ */
+async function getSettledAssets(groupIds) {
+  if (!groupIds || groupIds.length === 0) return [];
+  const { data } = await db.collection('assets')
+    .where({ groupId: _.in(groupIds), status: 'settled' })
+    .orderBy('updatedAt', 'desc')
+    .get();
+  return data;
 }
 
 /**
@@ -284,6 +309,8 @@ module.exports = {
   createAsset,
   updateAsset,
   deleteAsset,
+  settleAsset,
+  getSettledAssets,
   createGroup,
   getGroupDetail,
   joinGroup,

@@ -3,6 +3,26 @@
  * WXS is a subset of JS that can be referenced from WXML
  */
 
+function formatYuan(amount) {
+  if (amount === undefined || amount === null) return '¥0';
+  var num = parseFloat(amount);
+  if (isNaN(num)) return '¥0';
+  var prefix = num < 0 ? '-¥' : '¥';
+  var abs = num < 0 ? -num : num;
+  var str = Math.floor(abs).toString();
+  var result = '';
+  var len = str.length;
+  var count = 0;
+  for (var i = len - 1; i >= 0; i--) {
+    if (count > 0 && count % 3 === 0) {
+      result = ',' + result;
+    }
+    result = str.charAt(i) + result;
+    count++;
+  }
+  return prefix + result;
+}
+
 function formatCurrency(amount) {
   if (amount === undefined || amount === null) return '¥0';
   var num = parseFloat(amount);
@@ -97,12 +117,57 @@ function isAssetReturnPositive(asset) {
   return (parseFloat(asset.currentValue) - parseFloat(asset.purchaseAmount)) >= 0;
 }
 
+function getCategoryReturnAmount(assets) {
+  if (!assets || assets.length === 0) return '¥0';
+  var totalValue = 0;
+  var totalCost = 0;
+  for (var i = 0; i < assets.length; i++) {
+    totalValue += parseFloat(assets[i].currentValue || 0);
+    totalCost += parseFloat(assets[i].purchaseAmount || 0);
+  }
+  var returnVal = totalValue - totalCost;
+  var abs = returnVal >= 0 ? returnVal : -returnVal;
+  var prefixSign = returnVal >= 0 ? '+' : '-';
+  var str = Math.floor(abs).toString();
+  var result = '';
+  var len = str.length;
+  var count = 0;
+  for (var i = len - 1; i >= 0; i--) {
+    if (count > 0 && count % 3 === 0) {
+      result = ',' + result;
+    }
+    result = str.charAt(i) + result;
+    count++;
+  }
+  return prefixSign + '¥' + result;
+}
+
 function getFirstChar(str) {
   if (!str) return '?';
   return str.charAt(0);
 }
 
+function getAssetReturnAmount(item) {
+  if (!item) return '¥0';
+  var diff = parseFloat(item.currentValue || 0) - parseFloat(item.purchaseAmount || 0);
+  var prefix = diff >= 0 ? '+' : '-';
+  var abs = diff >= 0 ? diff : -diff;
+  var str = Math.floor(abs).toString();
+  var result = '';
+  var len = str.length;
+  var count = 0;
+  for (var i = len - 1; i >= 0; i--) {
+    if (count > 0 && count % 3 === 0) {
+      result = ',' + result;
+    }
+    result = str.charAt(i) + result;
+    count++;
+  }
+  return prefix + '¥' + result;
+}
+
 module.exports = {
+  formatYuan: formatYuan,
   formatCurrency: formatCurrency,
   formatDate: formatDate,
   calcReturnRate: calcReturnRate,
@@ -110,8 +175,10 @@ module.exports = {
   getCategoryCost: getCategoryCost,
   getCategoryReturnRate: getCategoryReturnRate,
   getCategoryReturnRateStr: getCategoryReturnRateStr,
+  getCategoryReturnAmount: getCategoryReturnAmount,
   isReturnPositive: isReturnPositive,
   getAssetReturn: getAssetReturn,
+  getAssetReturnAmount: getAssetReturnAmount,
   isAssetReturnPositive: isAssetReturnPositive,
   getFirstChar: getFirstChar,
 };

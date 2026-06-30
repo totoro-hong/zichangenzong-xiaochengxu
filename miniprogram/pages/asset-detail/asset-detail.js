@@ -45,6 +45,8 @@ Page({
       const purchaseAmount = Number(asset.purchaseAmount || 0);
       const currentValue = Number(asset.currentValue || 0);
       const returnRate = util.calcReturnRate(purchaseAmount, currentValue);
+      const fmt = util.formatYuan;
+      const isSettled = asset.status === 'settled';
 
       // Holding period & annualized return
       const holdingDays = util.calcHoldingDays(asset.purchaseDate);
@@ -55,10 +57,11 @@ Page({
         loading: false,
         returnRate: (returnRate >= 0 ? '+' : '') + returnRate.toFixed(1) + '%',
         returnPositive: returnRate >= 0,
-        formattedPurchaseAmount: util.formatCurrency(purchaseAmount),
-        formattedCurrentValue: util.formatCurrency(currentValue),
+        formattedPurchaseAmount: fmt(purchaseAmount),
+        formattedCurrentValue: fmt(currentValue),
         formattedCreatedAt: util.formatDateTime(asset.createdAt),
         formattedUpdatedAt: util.formatDateTime(asset.updatedAt),
+        isSettled,
         holdingDisplay: util.formatHoldingDays(holdingDays),
         annualizedReturn: annualizedReturn !== 0 ? (annualizedReturn >= 0 ? '+' : '') + annualizedReturn.toFixed(2) + '%' : '--',
         annualizedPositive: annualizedReturn >= 0,
@@ -73,6 +76,29 @@ Page({
   goEdit() {
     wx.navigateTo({
       url: `/pages/asset-edit/asset-edit?id=${this.data.asset._id}`,
+    });
+  },
+
+  settleAsset() {
+    const that = this;
+    wx.showModal({
+      title: '结清资产',
+      content: `确定要将「${that.data.asset.name}」标记为已结清吗？结清后将从当前资产列表中移除，可在历史资产中查看。`,
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await dbHelper.settleAsset(that.data.asset._id);
+            app.invalidateCache();
+            wx.showToast({ title: '已结清', icon: 'success' });
+            setTimeout(() => {
+              wx.navigateBack();
+            }, 1000);
+          } catch (err) {
+            console.error('Settle error:', err);
+            wx.showToast({ title: '操作失败', icon: 'none' });
+          }
+        }
+      },
     });
   },
 

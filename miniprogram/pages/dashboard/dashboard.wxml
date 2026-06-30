@@ -145,6 +145,7 @@
                   </view>
                   <view class="cat-stats">
                     <text class="cat-cost">成本 {{calc.getCategoryCost(item.assets)}}</text>
+                    <text class="cat-return-amount {{calc.isReturnPositive(item.assets) ? 'text-red' : 'text-emerald'}}">{{calc.getCategoryReturnAmount(item.assets)}}</text>
                     <text class="cat-return {{calc.isReturnPositive(item.assets) ? 'text-red' : 'text-emerald'}}">{{calc.getCategoryReturnRateStr(item.assets)}}</text>
                   </view>
                 </view>
@@ -159,7 +160,8 @@
                       </view>
                     </view>
                     <view class="asset-item-right">
-                      <text class="asset-value">{{fmt.formatCurrency(item.currentValue)}}</text>
+                      <text class="asset-value">{{fmt.formatYuan(item.currentValue)}}</text>
+                      <text wx:if="{{item.purchaseAmount}}" class="asset-return-amount {{calc.isAssetReturnPositive(item) ? 'text-red' : 'text-emerald'}}">{{calc.getAssetReturnAmount(item)}}</text>
                       <text class="asset-return {{calc.isAssetReturnPositive(item) ? 'text-red' : 'text-emerald'}}">{{calc.getAssetReturn(item)}}</text>
                     </view>
                   </view>
